@@ -9,8 +9,16 @@ import AssistantHome from '../screens/assistant/AssistantHome';
 import ApproverHome from '../screens/approver/ApproverHome';
 
 import { useAuth } from '../context/AuthContext';
+import ProfileScreen from '../screens/common/ProfileScreen';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Login: undefined;
+  AdminHome: undefined;
+  AssistantHome: undefined;
+  ApproverHome: undefined;
+  Profile: undefined; // ✅ Add this route
+};
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   const { user } = useAuth();
@@ -27,6 +35,9 @@ const AppNavigator = () => {
         ) : (
           <Stack.Screen name="ApproverHome" component={ApproverHome} />
         )}
+
+        {/* ✅ Always available routes */}
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

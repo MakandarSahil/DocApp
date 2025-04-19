@@ -23,6 +23,7 @@ interface Props {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   contentContainerStyle?: object;
+  onNavigateToProfile?: () => void;
 }
 
 // Custom theme for Paper Provider
@@ -43,6 +44,7 @@ const DashboardLayout = ({
   onRefresh,
   isRefreshing = false,
   contentContainerStyle,
+  onNavigateToProfile,
 }: Props) => {
   const navigation = useNavigation();
   const { logout } = useAuth();
@@ -51,7 +53,6 @@ const DashboardLayout = ({
 
   // Role-based navigation handlers
   const navHandlers = useMemo(() => ({
-    onNavigateToProfile: () => console.log('Navigate to Profile'),
     onManageUsers: () => userRole === 'admin' && console.log('Manage Users'),
     onViewAllUsers: () => userRole === 'approver' && console.log('All Users'),
     onViewHistory: () => userRole === 'approver' && console.log('View History'),
@@ -86,7 +87,8 @@ const DashboardLayout = ({
           showSearch={searchActive}
           searchValue={query}
           onSearchChange={handleSearchChange}
-          onToggleSearch={toggleSearch}
+          onToggleSearch={toggleSearch} 
+          onNavigateToProfile={onNavigateToProfile}
           {...navHandlers}
         />
 
@@ -124,7 +126,7 @@ const DashboardLayout = ({
   );
 };
 
-export default DashboardLayout;
+export default DashboardLayout; 
 
 const styles = StyleSheet.create({
   safeArea: {

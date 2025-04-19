@@ -1,10 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import DashboardLayout from '../../layout/DashboardLayout';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ApproverHome'>;
 
 export default function ApproverHome() {
+  const navigation = useNavigation<NavigationProp>();
   return (
-    <DashboardLayout userRole="approver" label="Approver">
+    <DashboardLayout
+      userRole="approver"
+      label="Approver"
+      onNavigateToProfile={() => navigation.navigate('Profile')}
+    >
       <View style={styles.container}>
         <Text style={styles.welcomeText}>Welcome, Approver!</Text>
       </View>
