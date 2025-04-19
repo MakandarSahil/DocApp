@@ -8,13 +8,13 @@ type UserType = {
 type AuthContextType = {
   user: UserType | null;
   login: (username: string, password: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;  // Make logout async
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   login: () => {},
-  logout: () => {},
+  logout: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
 
   const login = (username: string, password: string) => {
-    // Mock logic: infer role from username
     const role =
       username.toLowerCase() === 'admin'
         ? 'ADMIN'
@@ -34,7 +33,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser({ username, role });
   };
 
-  const logout = () => setUser(null);
+  const logout = async () => {
+    setUser(null);
+    // Add any async cleanup here if needed
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

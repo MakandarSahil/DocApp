@@ -3,6 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../context/AuthContext';
+import { RootStackParamList } from '../../types/navigationTypes';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Alert } from 'react-native';
+
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
 
 const user = {
   name: 'Sahil Makandar',
@@ -15,6 +22,31 @@ const user = {
 };
 
 const ProfileScreen = () => {
+  const { logout } = useAuth();
+  const navigation = useNavigation();
+  
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Reset navigation stack and go to Login screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }], // Replace 'Login' with your actual login screen name
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      Alert.alert('Error', 'Failed to logout. Please try again.');
+    }
+  };
+
+  const handleNotifications = () => {
+    console.log('notification'); // Adjust as needed for your app's navigation structure
+  };
+  
   const handleCall = () => Linking.openURL(`tel:${user.phone}`);
   const handleWhatsApp = () => Linking.openURL(`https://wa.me/${user.phone.replace(/[^0-9]/g, '')}`);
 
@@ -23,7 +55,7 @@ const ProfileScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
         <LinearGradient colors={['#1e40af', '#2563eb']} style={styles.header}>
-          <TouchableOpacity style={styles.backButton}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
             <Ionicons name="chevron-back" size={24} color="white" />
           </TouchableOpacity>
 
@@ -103,14 +135,14 @@ const ProfileScreen = () => {
         {/* Account Settings Card */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} >
             <View style={[styles.settingIconContainer, { backgroundColor: '#d1fae5' }]}>
               <Ionicons name="notifications-outline" size={20} color="#10b981" />
             </View>
             <Text style={styles.settingText}>Notifications</Text>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" style={styles.chevron} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={handleLogout}>
             <View style={[styles.settingIconContainer, { backgroundColor: '#fee2e2' }]}>
               <Ionicons name="log-out-outline" size={20} color="#ef4444" />
             </View>
@@ -145,6 +177,12 @@ const styles = StyleSheet.create({
     top: 16,
     left: 16,
     zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   avatarContainer: {
     marginTop: 24,
