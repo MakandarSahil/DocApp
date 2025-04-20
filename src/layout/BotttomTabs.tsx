@@ -7,15 +7,25 @@ import CorrectionScreen from '../screens/tabScreens/CorrectionScreen';
 import RejectedScreen from '../screens/tabScreens/RejectedScreen';
 import DashboardLayout from './DashboardLayout';
 import CustomTabBar from '../components/CustomTabBar';
+import ProfileScreen from '../screens/common/ProfileScreen';
+import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
-const createScreenWrapper = (ScreenComponent: React.ComponentType) => () => {
-  return (
-    <DashboardLayout>
-      <ScreenComponent />
-    </DashboardLayout>
-  );
+const createScreenWrapper = (ScreenComponent: React.ComponentType) => {
+  return (props: any) => {
+    const navigation = useNavigation();
+    
+    const handleProfilePress = () => {
+      navigation.navigate('Profile');
+    };
+
+    return (
+      <DashboardLayout onNavigateToProfile={handleProfilePress}>
+        <ScreenComponent {...props} />
+      </DashboardLayout>
+    );
+  };
 };
 
 export default function BottomTabs() {
@@ -26,6 +36,7 @@ export default function BottomTabs() {
         headerShown: false,
       }}
     >
+      {/* <Tab.Screen name="Profile" component={ProfileScreen} /> */}
       <Tab.Screen 
         name="Pending" 
         component={createScreenWrapper(PendingScreen)}
