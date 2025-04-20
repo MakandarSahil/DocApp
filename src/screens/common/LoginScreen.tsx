@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
+  Linking,
 } from 'react-native';
 import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
@@ -54,6 +55,10 @@ const LoginScreen: React.FC = () => {
   const dismissKeyboard = React.useCallback(() => {
     Keyboard.dismiss();
   }, []);
+
+  const handleContactAdmin = () => {
+     Linking.openURL(`tel:+91 9579891114`);
+  };
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -169,7 +174,7 @@ const LoginScreen: React.FC = () => {
                 <View style={styles.footer}>
                   <Text style={styles.forgotText}>Forgot password?</Text>
                   <TouchableOpacity activeOpacity={0.6}>
-                    <Text style={styles.contactText}> Contact Admin</Text>
+                    <Text onPress={handleContactAdmin} style={styles.contactText}> Contact Admin</Text>
                   </TouchableOpacity>
                 </View>
               </View>
