@@ -17,8 +17,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
   children: ReactNode;
-  userRole: 'admin' | 'approver' | 'assistant';
-  label: string;
   loading?: boolean;
   onRefresh?: () => void;
   isRefreshing?: boolean;
@@ -26,7 +24,6 @@ interface Props {
   onNavigateToProfile?: () => void;
 }
 
-// Custom theme for Paper Provider
 const theme = {
   ...DefaultTheme,
   colors: {
@@ -38,38 +35,41 @@ const theme = {
 
 const DashboardLayout = ({ 
   children, 
-  userRole, 
-  label,
   loading = false,
   onRefresh,
   isRefreshing = false,
   contentContainerStyle,
   onNavigateToProfile,
 }: Props) => {
+  const { user, logout } = useAuth(); 
   const navigation = useNavigation();
-  const { logout } = useAuth();
   const [searchActive, setSearchActive] = useState(false);
   const [query, setQuery] = useState('');
 
-  // Role-based navigation handlers
+  // Type guard for user role
+  const getUserRole = (): 'admin' | 'approver' | 'assistant' | undefined => {
+    if (!user?.role) return undefined;
+    return user.role.toLowerCase() as 'admin' | 'approver' | 'assistant';
+  };
+
+  const userRole = getUserRole();
+
   const navHandlers = useMemo(() => ({
     onManageUsers: () => userRole === 'admin' && console.log('Manage Users'),
     onViewAllUsers: () => userRole === 'approver' && console.log('All Users'),
     onViewHistory: () => userRole === 'approver' && console.log('View History'),
     onLogout: () => logout(),
-  }), [navigation, userRole, logout]);
+  }), [userRole, logout]);
 
-  // Toggle search and handle search query changes
   const toggleSearch = () => {
     if (searchActive && query) {
-      setQuery('');  // Clear query when closing search
+      setQuery('');
     }
     setSearchActive(prev => !prev);
   };
 
   const handleSearchChange = (text: string) => {
     setQuery(text);
-    // Implement debounced search here if needed
   };
 
   return (
@@ -82,7 +82,7 @@ const DashboardLayout = ({
         />
         
         <DashboardNavbar
-          label={label}
+          label={user ? `Welcome, ${user.username}` : 'Welcome'}
           userRole={userRole}
           showSearch={searchActive}
           searchValue={query}
@@ -126,8 +126,6 @@ const DashboardLayout = ({
   );
 };
 
-export default DashboardLayout; 
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -146,3 +144,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default DashboardLayout;

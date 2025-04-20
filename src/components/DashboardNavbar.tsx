@@ -12,6 +12,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Menu } from 'react-native-paper';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
+type UserRole = 'admin' | 'approver' | 'assistant';
+
 interface Props {
   label?: string;
   showSearch?: boolean;
@@ -23,7 +26,7 @@ interface Props {
   onViewAllUsers?: () => void;
   onViewHistory?: () => void;
   onLogout?: () => void;
-  userRole: 'admin' | 'approver' | 'assistant';
+  userRole?: UserRole; 
 }
 
 const DashboardNavbar = memo(({
@@ -163,7 +166,7 @@ const DashboardNavbar = memo(({
           </Animated.View>
         ) : (
           <Animated.View style={{ opacity: Animated.subtract(1, fadeAnim) }}>
-            <Text style={styles.title}>Welcome, {label}</Text>
+            <Text style={styles.title}>{label}</Text>
           </Animated.View>
         )}
       </View>
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '500',
     color: '#1F2937',
   },
