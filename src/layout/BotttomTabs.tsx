@@ -12,21 +12,32 @@ import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
-const createScreenWrapper = (ScreenComponent: React.ComponentType) => {
-  return (props: any) => {
+const createScreenWrapper = (
+  ScreenComponent: React.ComponentType<{ query: string; userRole?: 'admin' | 'approver' | 'assistant' }>
+) => {
+  return () => {
     const navigation = useNavigation();
-    
+
     const handleProfilePress = () => {
       navigation.navigate('Profile');
     };
 
     return (
       <DashboardLayout onNavigateToProfile={handleProfilePress}>
-        <ScreenComponent {...props} />
+        {({ query, userRole }) => {
+          const validUserRole = ['admin', 'approver', 'assistant'].includes(userRole || '')
+            ? (userRole as 'admin' | 'approver' | 'assistant')
+            : undefined;
+
+          return (
+            <ScreenComponent query={query} userRole={validUserRole} />
+          );
+        }}
       </DashboardLayout>
     );
   };
 };
+
 
 export default function BottomTabs() {
   return (

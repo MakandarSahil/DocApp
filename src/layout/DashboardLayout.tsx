@@ -16,7 +16,7 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
-  children: ReactNode;
+  children: (props: { query: string; userRole?: 'admin' | 'approver' | 'assistant' }) => ReactNode;
   loading?: boolean;
   onRefresh?: () => void;
   isRefreshing?: boolean;
@@ -103,7 +103,7 @@ const DashboardLayout = ({
             </View>
           ) : (
             <View style={[styles.scrollContent, contentContainerStyle]}>
-              {children}
+              {children({ query, userRole })}
             </View>
           )}
         </KeyboardAvoidingView>
