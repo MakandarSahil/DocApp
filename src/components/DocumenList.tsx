@@ -77,18 +77,18 @@ const DocumentList: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 16,
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 4,
     color: '#111827',
   },
   listContent: {
-    padding: 16,
+    padding: 4,
     paddingTop: 8,
   },
   emptyListContent: {

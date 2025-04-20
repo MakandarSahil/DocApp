@@ -65,7 +65,7 @@ const ApprovedScreen: React.FC<Props> = ({ query, userRole }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'black',
   },
 });
 
