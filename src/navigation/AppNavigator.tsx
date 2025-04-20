@@ -6,11 +6,14 @@ import LoginScreen from '../screens/common/LoginScreen';
 import { useAuth } from '../context/AuthContext';
 import ProfileScreen from '../screens/common/ProfileScreen';
 import BottomTabs from '../layout/BotttomTabs';
+import { Document } from '../types/document';
+import DocumentDetailsScreen from '../screens/common/DocumentDetailScreen';
 
 export type RootStackParamList = {
   Login: undefined;
-  MainApp: undefined;  // This will hold our BottomTabs
+  MainApp: undefined;
   Profile: undefined;
+  DocumentDetails: { document: Document }; // ✅ Add this
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -27,6 +30,7 @@ const AppNavigator = () => {
           <>
             <Stack.Screen name="MainApp" component={BottomTabs} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="DocumentDetails" component={DocumentDetailsScreen} />
           </>
         )}
       </Stack.Navigator>

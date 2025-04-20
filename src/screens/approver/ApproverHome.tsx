@@ -3,19 +3,20 @@ import { View, Text, StyleSheet } from 'react-native';
 import DashboardLayout from '../../layout/DashboardLayout';
 import { useNavigation } from '@react-navigation/native';
 
-export default function AssistantHome() {
-
+export default function ApproverHome() {
   const navigation = useNavigation();
+
   const handleProfilePress = () => {
-    navigation.navigate('Profile'); // Replace 'Profile' with your actual profile screen name
+    navigation.navigate('Profile'); // if Profile exists in AppNavigator
   };
+
   return (
-    <DashboardLayout
-      onNavigateToProfile={handleProfilePress}
-    >
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Welcome, Assistant!</Text>
-      </View>
+    <DashboardLayout onNavigateToProfile={handleProfilePress}>
+      {() => (
+        <View style={styles.container}>
+          <Text style={styles.welcomeText}>Welcome, Approver</Text>
+        </View>
+      )}
     </DashboardLayout>
   );
 }

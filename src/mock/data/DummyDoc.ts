@@ -1,163 +1,72 @@
-export interface Document {
-  id: string;
-  name: string;
-  status: 'pending' | 'approved' | 'rejected' | 'correction';
-  date: string;
-  role: 'admin' | 'approver' | 'assistant';
-}
+import { Document } from '../../types/document'; // Import the shared interface
 
+// Sample document data with proper status types
 export const dummyDocuments: Document[] = [
+  // ----- APPROVED -----
+  { id: '1', name: 'Financial Report Q1.pdf', status: 'approved', date: '2025-04-01', role: 'approver', fileUrl: 'https://example.com/docs/1.pdf' },
+  { id: '2', name: 'Budget Allocation FY25.pdf', status: 'approved', date: '2025-04-02', role: 'approver', fileUrl: 'https://example.com/docs/2.pdf' },
+  { id: '3', name: 'Hiring Plan.pdf', status: 'approved', date: '2025-04-03', role: 'assistant', fileUrl: 'https://example.com/docs/3.pdf' },
+  { id: '4', name: 'Audit Summary.pdf', status: 'approved', date: '2025-04-04', role: 'admin', fileUrl: 'https://example.com/docs/4.pdf' },
+  { id: '5', name: 'Product Design.pdf', status: 'approved', date: '2025-04-05', role: 'approver', fileUrl: 'https://example.com/docs/5.pdf' },
+  { id: '6', name: 'Customer Feedback.pdf', status: 'approved', date: '2025-04-06', role: 'assistant', fileUrl: 'https://example.com/docs/6.pdf' },
+  { id: '7', name: 'Vendor Agreement.pdf', status: 'approved', date: '2025-04-07', role: 'admin', fileUrl: 'https://example.com/docs/7.pdf' },
+  { id: '8', name: 'Software License.pdf', status: 'approved', date: '2025-04-08', role: 'approver', fileUrl: 'https://example.com/docs/8.pdf' },
+  { id: '9', name: 'Compliance Checklist.pdf', status: 'approved', date: '2025-04-09', role: 'assistant', fileUrl: 'https://example.com/docs/9.pdf' },
+  { id: '10', name: 'Strategic Plan.pdf', status: 'approved', date: '2025-04-10', role: 'admin', fileUrl: 'https://example.com/docs/10.pdf' },
 
-  //pendig tab data
-  // Approver
-  { id: '1', name: 'Doc A1.pdf', status: 'pending', date: '2023-06-15', role: 'approver' },
-  { id: '2', name: 'Doc A2.pdf', status: 'pending', date: '2023-06-14', role: 'approver' },
-  { id: '3', name: 'Doc A3.pdf', status: 'pending', date: '2023-06-13', role: 'approver' },
-  { id: '4', name: 'Doc A4.pdf', status: 'pending', date: '2023-06-12', role: 'approver' },
-  { id: '5', name: 'Doc A5.pdf', status: 'pending', date: '2023-06-11', role: 'approver' },
-  { id: '6', name: 'Doc A6.pdf', status: 'pending', date: '2023-06-10', role: 'approver' },
-  { id: '7', name: 'Doc A7.pdf', status: 'pending', date: '2023-06-09', role: 'approver' },
-  { id: '8', name: 'Doc A8.pdf', status: 'pending', date: '2023-06-08', role: 'approver' },
-  { id: '9', name: 'Doc A9.pdf', status: 'pending', date: '2023-06-07', role: 'approver' },
-  { id: '10', name: 'Doc A10.pdf', status: 'pending', date: '2023-06-06', role: 'approver' },
+  // ----- PENDING -----
+  { id: '11', name: 'New Project Proposal.pdf', status: 'pending', date: '2025-04-11', role: 'approver', fileUrl: 'https://example.com/docs/11.pdf' },
+  { id: '12', name: 'Marketing Plan.pdf', status: 'pending', date: '2025-04-12', role: 'approver', fileUrl: 'https://example.com/docs/12.pdf' },
+  { id: '13', name: 'Q2 Goals.pdf', status: 'pending', date: '2025-04-13', role: 'assistant', fileUrl: 'https://example.com/docs/13.pdf' },
+  { id: '14', name: 'IT Infrastructure Plan.pdf', status: 'pending', date: '2025-04-14', role: 'approver', fileUrl: 'https://example.com/docs/14.pdf' },
+  { id: '15', name: 'Annual Review Template.pdf', status: 'pending', date: '2025-04-15', role: 'approver', fileUrl: 'https://example.com/docs/15.pdf' },
+  { id: '16', name: 'Workshop Schedule.pdf', status: 'pending', date: '2025-04-16', role: 'assistant', fileUrl: 'https://example.com/docs/16.pdf' },
+  { id: '17', name: 'Job Descriptions.pdf', status: 'pending', date: '2025-04-17', role: 'admin', fileUrl: 'https://example.com/docs/17.pdf' },
+  { id: '18', name: 'Team Structure.pdf', status: 'pending', date: '2025-04-18', role: 'approver', fileUrl: 'https://example.com/docs/18.pdf' },
+  { id: '19', name: 'Vendor Quotes.pdf', status: 'pending', date: '2025-04-19', role: 'assistant', fileUrl: 'https://example.com/docs/19.pdf' },
+  { id: '20', name: 'Meeting Notes.pdf', status: 'pending', date: '2025-04-20', role: 'admin', fileUrl: 'https://example.com/docs/20.pdf' },
 
-  // Assistant
-  { id: '11', name: 'Doc B1.pdf', status: 'pending', date: '2023-06-15', role: 'assistant' },
-  { id: '12', name: 'Doc B2.pdf', status: 'pending', date: '2023-06-14', role: 'assistant' },
-  { id: '13', name: 'Doc B3.pdf', status: 'pending', date: '2023-06-13', role: 'assistant' },
-  { id: '14', name: 'Doc B4.pdf', status: 'pending', date: '2023-06-12', role: 'assistant' },
-  { id: '15', name: 'Doc B5.pdf', status: 'pending', date: '2023-06-11', role: 'assistant' },
-  { id: '16', name: 'Doc B6.pdf', status: 'pending', date: '2023-06-10', role: 'assistant' },
-  { id: '17', name: 'Doc B7.pdf', status: 'pending', date: '2023-06-09', role: 'assistant' },
-  { id: '18', name: 'Doc B8.pdf', status: 'pending', date: '2023-06-08', role: 'assistant' },
-  { id: '19', name: 'Doc B9.pdf', status: 'pending', date: '2023-06-07', role: 'assistant' },
-  { id: '20', name: 'Doc B10.pdf', status: 'pending', date: '2023-06-06', role: 'assistant' },
+  // ----- REJECTED -----
+  { id: '21', name: 'Outdated Brochure.pdf', status: 'rejected', date: '2025-04-01', role: 'admin', fileUrl: 'https://example.com/docs/21.pdf' },
+  { id: '22', name: 'Incomplete Timesheet.pdf', status: 'rejected', date: '2025-04-02', role: 'approver', fileUrl: 'https://example.com/docs/22.pdf' },
+  { id: '23', name: 'Draft Policy.pdf', status: 'rejected', date: '2025-04-03', role: 'assistant', fileUrl: 'https://example.com/docs/23.pdf' },
+  { id: '24', name: 'Client Onboarding Checklist.pdf', status: 'rejected', date: '2025-04-04', role: 'admin', fileUrl: 'https://example.com/docs/24.pdf' },
+  { id: '25', name: 'Unformatted Resume.pdf', status: 'rejected', date: '2025-04-05', role: 'approver', fileUrl: 'https://example.com/docs/25.pdf' },
+  { id: '26', name: 'Broken Image Links.pdf', status: 'rejected', date: '2025-04-06', role: 'assistant', fileUrl: 'https://example.com/docs/26.pdf' },
+  { id: '27', name: 'Outdated Compliance File.pdf', status: 'rejected', date: '2025-04-07', role: 'admin', fileUrl: 'https://example.com/docs/27.pdf' },
+  { id: '28', name: 'Duplicate Document.pdf', status: 'rejected', date: '2025-04-08', role: 'approver', fileUrl: 'https://example.com/docs/28.pdf' },
+  { id: '29', name: 'Incorrect Metrics.pdf', status: 'rejected', date: '2025-04-09', role: 'assistant', fileUrl: 'https://example.com/docs/29.pdf' },
+  { id: '30', name: 'Security Checklist Fail.pdf', status: 'rejected', date: '2025-04-10', role: 'admin', fileUrl: 'https://example.com/docs/30.pdf' },
 
-  // Admin
-  { id: '21', name: 'Doc C1.pdf', status: 'pending', date: '2023-06-15', role: 'admin' },
-  { id: '22', name: 'Doc C2.pdf', status: 'pending', date: '2023-06-14', role: 'admin' },
-  { id: '23', name: 'Doc C3.pdf', status: 'pending', date: '2023-06-13', role: 'admin' },
-  { id: '24', name: 'Doc C4.pdf', status: 'pending', date: '2023-06-12', role: 'admin' },
-  { id: '25', name: 'Doc C5.pdf', status: 'pending', date: '2023-06-11', role: 'admin' },
-  { id: '26', name: 'Doc C6.pdf', status: 'pending', date: '2023-06-10', role: 'admin' },
-  { id: '27', name: 'Doc C7.pdf', status: 'pending', date: '2023-06-09', role: 'admin' },
-  { id: '28', name: 'Doc C8.pdf', status: 'pending', date: '2023-06-08', role: 'admin' },
-  { id: '29', name: 'Doc C9.pdf', status: 'pending', date: '2023-06-07', role: 'admin' },
-  { id: '30', name: 'Doc C10.pdf', status: 'pending', date: '2023-06-06', role: 'admin' },
+  // ----- CORRECTION -----
+  { id: '31', name: 'HR Manual Draft.pdf', status: 'correction', date: '2025-04-11', role: 'admin', fileUrl: 'https://example.com/docs/31.pdf' },
+  { id: '32', name: 'Pending Invoices.pdf', status: 'correction', date: '2025-04-12', role: 'approver', fileUrl: 'https://example.com/docs/32.pdf' },
+  { id: '33', name: 'Training Material.pdf', status: 'correction', date: '2025-04-13', role: 'assistant', fileUrl: 'https://example.com/docs/33.pdf' },
+  { id: '34', name: 'Legal Notice.pdf', status: 'correction', date: '2025-04-14', role: 'admin', fileUrl: 'https://example.com/docs/34.pdf' },
+  { id: '35', name: 'Policy Edits.pdf', status: 'correction', date: '2025-04-15', role: 'approver', fileUrl: 'https://example.com/docs/35.pdf' },
+  { id: '36', name: 'Org Chart Update.pdf', status: 'correction', date: '2025-04-16', role: 'assistant', fileUrl: 'https://example.com/docs/36.pdf' },
+  { id: '37', name: 'Review Notes.pdf', status: 'correction', date: '2025-04-17', role: 'admin', fileUrl: 'https://example.com/docs/37.pdf' },
+  { id: '38', name: 'UI Mockups.pdf', status: 'correction', date: '2025-04-18', role: 'approver', fileUrl: 'https://example.com/docs/38.pdf' },
+  { id: '39', name: 'Budget Draft.pdf', status: 'correction', date: '2025-04-19', role: 'assistant', fileUrl: 'https://example.com/docs/39.pdf' },
+  { id: '40', name: 'Security Policy Draft.pdf', status: 'correction', date: '2025-04-20', role: 'admin', fileUrl: 'https://example.com/docs/40.pdf' },
+];
 
-
-  // ===== CORRECTION =====
-  { id: '91', name: 'Doc A1.pdf', status: 'correction', date: '2023-06-25', role: 'approver' },
-  { id: '92', name: 'Doc A2.pdf', status: 'correction', date: '2023-06-24', role: 'approver' },
-  { id: '93', name: 'Doc A3.pdf', status: 'correction', date: '2023-06-23', role: 'approver' },
-  { id: '94', name: 'Doc A4.pdf', status: 'correction', date: '2023-06-22', role: 'approver' },
-  { id: '95', name: 'Doc A5.pdf', status: 'correction', date: '2023-06-21', role: 'approver' },
-  { id: '96', name: 'Doc A6.pdf', status: 'correction', date: '2023-06-20', role: 'approver' },
-  { id: '97', name: 'Doc A7.pdf', status: 'correction', date: '2023-06-19', role: 'approver' },
-  { id: '98', name: 'Doc A8.pdf', status: 'correction', date: '2023-06-18', role: 'approver' },
-  { id: '99', name: 'Doc A9.pdf', status: 'correction', date: '2023-06-17', role: 'approver' },
-  { id: '100', name: 'Doc A10.pdf', status: 'correction', date: '2023-06-16', role: 'approver' },
-
-  { id: '101', name: 'Doc B1.pdf', status: 'correction', date: '2023-06-25', role: 'assistant' },
-  { id: '102', name: 'Doc B2.pdf', status: 'correction', date: '2023-06-24', role: 'assistant' },
-  { id: '103', name: 'Doc B3.pdf', status: 'correction', date: '2023-06-23', role: 'assistant' },
-  { id: '104', name: 'Doc B4.pdf', status: 'correction', date: '2023-06-22', role: 'assistant' },
-  { id: '105', name: 'Doc B5.pdf', status: 'correction', date: '2023-06-21', role: 'assistant' },
-  { id: '106', name: 'Doc B6.pdf', status: 'correction', date: '2023-06-20', role: 'assistant' },
-  { id: '107', name: 'Doc B7.pdf', status: 'correction', date: '2023-06-19', role: 'assistant' },
-  { id: '108', name: 'Doc B8.pdf', status: 'correction', date: '2023-06-18', role: 'assistant' },
-  { id: '109', name: 'Doc B9.pdf', status: 'correction', date: '2023-06-17', role: 'assistant' },
-  { id: '110', name: 'Doc B10.pdf', status: 'correction', date: '2023-06-16', role: 'assistant' },
-
-  { id: '111', name: 'Doc C1.pdf', status: 'correction', date: '2023-06-25', role: 'admin' },
-  { id: '112', name: 'Doc C2.pdf', status: 'correction', date: '2023-06-24', role: 'admin' },
-  { id: '113', name: 'Doc C3.pdf', status: 'correction', date: '2023-06-23', role: 'admin' },
-  { id: '114', name: 'Doc C4.pdf', status: 'correction', date: '2023-06-22', role: 'admin' },
-  { id: '115', name: 'Doc C5.pdf', status: 'correction', date: '2023-06-21', role: 'admin' },
-  { id: '116', name: 'Doc C6.pdf', status: 'correction', date: '2023-06-20', role: 'admin' },
-  { id: '117', name: 'Doc C7.pdf', status: 'correction', date: '2023-06-19', role: 'admin' },
-  { id: '118', name: 'Doc C8.pdf', status: 'correction', date: '2023-06-18', role: 'admin' },
-  { id: '119', name: 'Doc C9.pdf', status: 'correction', date: '2023-06-17', role: 'admin' },
-  { id: '120', name: 'Doc C10.pdf', status: 'correction', date: '2023-06-16', role: 'admin' },
-
-  { id: '31', name: 'Doc A1.pdf', status: 'approved', date: '2023-06-05', role: 'approver' },
-  { id: '32', name: 'Doc A2.pdf', status: 'approved', date: '2023-06-04', role: 'approver' },
-  { id: '33', name: 'Doc A3.pdf', status: 'approved', date: '2023-06-03', role: 'approver' },
-  { id: '34', name: 'Doc A4.pdf', status: 'approved', date: '2023-06-02', role: 'approver' },
-  { id: '35', name: 'Doc A5.pdf', status: 'approved', date: '2023-06-01', role: 'approver' },
-  { id: '36', name: 'Doc A6.pdf', status: 'approved', date: '2023-05-31', role: 'approver' },
-  { id: '37', name: 'Doc A7.pdf', status: 'approved', date: '2023-05-30', role: 'approver' },
-  { id: '38', name: 'Doc A8.pdf', status: 'approved', date: '2023-05-29', role: 'approver' },
-  { id: '39', name: 'Doc A9.pdf', status: 'approved', date: '2023-05-28', role: 'approver' },
-  { id: '40', name: 'Doc A10.pdf', status: 'approved', date: '2023-05-27', role: 'approver' },
-
-  { id: '41', name: 'Doc B1.pdf', status: 'approved', date: '2023-06-05', role: 'assistant' },
-  { id: '42', name: 'Doc B2.pdf', status: 'approved', date: '2023-06-04', role: 'assistant' },
-  { id: '43', name: 'Doc B3.pdf', status: 'approved', date: '2023-06-03', role: 'assistant' },
-  { id: '44', name: 'Doc B4.pdf', status: 'approved', date: '2023-06-02', role: 'assistant' },
-  { id: '45', name: 'Doc B5.pdf', status: 'approved', date: '2023-06-01', role: 'assistant' },
-  { id: '46', name: 'Doc B6.pdf', status: 'approved', date: '2023-05-31', role: 'assistant' },
-  { id: '47', name: 'Doc B7.pdf', status: 'approved', date: '2023-05-30', role: 'assistant' },
-  { id: '48', name: 'Doc B8.pdf', status: 'approved', date: '2023-05-29', role: 'assistant' },
-  { id: '49', name: 'Doc B9.pdf', status: 'approved', date: '2023-05-28', role: 'assistant' },
-  { id: '50', name: 'Doc B10.pdf', status: 'approved', date: '2023-05-27', role: 'assistant' },
-
-  { id: '51', name: 'Doc C1.pdf', status: 'approved', date: '2023-06-05', role: 'admin' },
-  { id: '52', name: 'Doc C2.pdf', status: 'approved', date: '2023-06-04', role: 'admin' },
-  { id: '53', name: 'Doc C3.pdf', status: 'approved', date: '2023-06-03', role: 'admin' },
-  { id: '54', name: 'Doc C4.pdf', status: 'approved', date: '2023-06-02', role: 'admin' },
-  { id: '55', name: 'Doc C5.pdf', status: 'approved', date: '2023-06-01', role: 'admin' },
-  { id: '56', name: 'Doc C6.pdf', status: 'approved', date: '2023-05-31', role: 'admin' },
-  { id: '57', name: 'Doc C7.pdf', status: 'approved', date: '2023-05-30', role: 'admin' },
-  { id: '58', name: 'Doc C8.pdf', status: 'approved', date: '2023-05-29', role: 'admin' },
-  { id: '59', name: 'Doc C9.pdf', status: 'approved', date: '2023-05-28', role: 'admin' },
-  { id: '60', name: 'Doc C10.pdf', status: 'approved', date: '2023-05-27', role: 'admin' },
-
-  // ===== REJECTED =====
-  { id: '61', name: 'Doc A1.pdf', status: 'rejected', date: '2023-06-20', role: 'approver' },
-  { id: '62', name: 'Doc A2.pdf', status: 'rejected', date: '2023-06-19', role: 'approver' },
-  { id: '63', name: 'Doc A3.pdf', status: 'rejected', date: '2023-06-18', role: 'approver' },
-  { id: '64', name: 'Doc A4.pdf', status: 'rejected', date: '2023-06-17', role: 'approver' },
-  { id: '65', name: 'Doc A5.pdf', status: 'rejected', date: '2023-06-16', role: 'approver' },
-  { id: '66', name: 'Doc A6.pdf', status: 'rejected', date: '2023-06-15', role: 'approver' },
-  { id: '67', name: 'Doc A7.pdf', status: 'rejected', date: '2023-06-14', role: 'approver' },
-  { id: '68', name: 'Doc A8.pdf', status: 'rejected', date: '2023-06-13', role: 'approver' },
-  { id: '69', name: 'Doc A9.pdf', status: 'rejected', date: '2023-06-12', role: 'approver' },
-  { id: '70', name: 'Doc A10.pdf', status: 'rejected', date: '2023-06-11', role: 'approver' },
-
-  { id: '71', name: 'Doc B1.pdf', status: 'rejected', date: '2023-06-20', role: 'assistant' },
-  { id: '72', name: 'Doc B2.pdf', status: 'rejected', date: '2023-06-19', role: 'assistant' },
-  { id: '73', name: 'Doc B3.pdf', status: 'rejected', date: '2023-06-18', role: 'assistant' },
-  { id: '74', name: 'Doc B4.pdf', status: 'rejected', date: '2023-06-17', role: 'assistant' },
-  { id: '75', name: 'Doc B5.pdf', status: 'rejected', date: '2023-06-16', role: 'assistant' },
-  { id: '76', name: 'Doc B6.pdf', status: 'rejected', date: '2023-06-15', role: 'assistant' },
-  { id: '77', name: 'Doc B7.pdf', status: 'rejected', date: '2023-06-14', role: 'assistant' },
-  { id: '78', name: 'Doc B8.pdf', status: 'rejected', date: '2023-06-13', role: 'assistant' },
-  { id: '79', name: 'Doc B9.pdf', status: 'rejected', date: '2023-06-12', role: 'assistant' },
-  { id: '80', name: 'Doc B10.pdf', status: 'rejected', date: '2023-06-11', role: 'assistant' },
-
-  { id: '81', name: 'Doc C1.pdf', status: 'rejected', date: '2023-06-20', role: 'admin' },
-  { id: '82', name: 'Doc C2.pdf', status: 'rejected', date: '2023-06-19', role: 'admin' },
-  { id: '83', name: 'Doc C3.pdf', status: 'rejected', date: '2023-06-18', role: 'admin' },
-  { id: '84', name: 'Doc C4.pdf', status: 'rejected', date: '2023-06-17', role: 'admin' },
-  { id: '85', name: 'Doc C5.pdf', status: 'rejected', date: '2023-06-16', role: 'admin' },
-  { id: '86', name: 'Doc C6.pdf', status: 'rejected', date: '2023-06-15', role: 'admin' },
-  { id: '87', name: 'Doc C7.pdf', status: 'rejected', date: '2023-06-14', role: 'admin' },
-  { id: '88', name: 'Doc C8.pdf', status: 'rejected', date: '2023-06-13', role: 'admin' },
-  { id: '89', name: 'Doc C9.pdf', status: 'rejected', date: '2023-06-12', role: 'admin' },
-  { id: '90', name: 'Doc C10.pdf', status: 'rejected', date: '2023-06-11', role: 'admin' },
-
-]
-
+// Function to filter documents based on status, role, and query
 export const getFilteredDocuments = (
-  status: Document['status'],
-  role: Document['role'],
+  status: string, 
+  role: string, 
   query: string
 ): Document[] => {
+  // Ensure status is cast to the correct type
+  const statusTyped = status as "approved" | "pending" | "rejected" | "correction";
+  
   return dummyDocuments.filter(
     (doc) =>
-      doc.status === status &&
+      doc.status === statusTyped &&
       doc.role === role &&
       doc.name.toLowerCase().includes(query.toLowerCase())
   );
 };
+
+// Export necessary types or functions
+export type { Document };

@@ -1,13 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import DashboardLayout from '../../layout/DashboardLayout';
+import { useNavigation } from '@react-navigation/native';
 
 export default function AdminHome() {
+  const navigation = useNavigation();
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile'); // if Profile exists in AppNavigator
+  };
+
   return (
-    <DashboardLayout>
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Welcome, Admin!</Text>
-      </View>
+    <DashboardLayout onNavigateToProfile={handleProfilePress}>
+      {() => (
+        <View style={styles.container}>
+          <Text style={styles.welcomeText}>Welcome, Admin!</Text>
+        </View>
+      )}
     </DashboardLayout>
   );
 }

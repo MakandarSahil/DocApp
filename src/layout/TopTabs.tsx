@@ -1,16 +1,14 @@
-// layout/BottomTabs.tsx
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+// layout/TopTabs.tsx
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
 import PendingScreen from '../screens/tabScreens/PendingScreen';
 import ApprovedScreen from '../screens/tabScreens/ApprovedScreen';
 import CorrectionScreen from '../screens/tabScreens/CorrectionScreen';
 import RejectedScreen from '../screens/tabScreens/RejectedScreen';
 import DashboardLayout from './DashboardLayout';
-import CustomTabBar from '../components/CustomTabBar';
-import ProfileScreen from '../screens/common/ProfileScreen';
 import { useNavigation } from '@react-navigation/native';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 const createScreenWrapper = (
   ScreenComponent: React.ComponentType<{ query: string; userRole?: 'admin' | 'approver' | 'assistant' }>
@@ -38,36 +36,21 @@ const createScreenWrapper = (
   };
 };
 
-
-export default function BottomTabs() {
+export default function TopTabs() {
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
-        headerShown: false,
+        tabBarIndicatorStyle: { backgroundColor: '#2563EB' },
+        tabBarLabelStyle: { fontWeight: '600', fontSize: 14 },
+        tabBarStyle: { backgroundColor: '#fff' },
+        swipeEnabled: true,
+        lazy: true,
       }}
     >
-      {/* <Tab.Screen name="Profile" component={ProfileScreen} /> */}
-      <Tab.Screen 
-        name="Pending" 
-        component={createScreenWrapper(PendingScreen)}
-        options={{ tabBarLabel: 'Pending' }}
-      />
-      <Tab.Screen 
-        name="Approved" 
-        component={createScreenWrapper(ApprovedScreen)}
-        options={{ tabBarLabel: 'Approved' }}
-      />
-      <Tab.Screen 
-        name="Correction" 
-        component={createScreenWrapper(CorrectionScreen)}
-        options={{ tabBarLabel: 'Correction' }}
-      />
-      <Tab.Screen 
-        name="Rejected" 
-        component={createScreenWrapper(RejectedScreen)}
-        options={{ tabBarLabel: 'Rejected' }}
-      />
+      <Tab.Screen name="Pending" component={createScreenWrapper(PendingScreen)} />
+      <Tab.Screen name="Approved" component={createScreenWrapper(ApprovedScreen)} />
+      <Tab.Screen name="Correction" component={createScreenWrapper(CorrectionScreen)} />
+      <Tab.Screen name="Rejected" component={createScreenWrapper(RejectedScreen)} />
     </Tab.Navigator>
   );
 }
