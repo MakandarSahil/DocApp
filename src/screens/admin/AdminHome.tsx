@@ -4,7 +4,7 @@ import DashboardLayout from '../../layout/DashboardLayout';
 
 export default function AdminHome() {
   return (
-    <DashboardLayout userRole="admin" label="Admin">
+    <DashboardLayout>
       <View style={styles.container}>
         <Text style={styles.welcomeText}>Welcome, Admin!</Text>
       </View>

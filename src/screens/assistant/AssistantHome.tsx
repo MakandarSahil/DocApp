@@ -4,7 +4,7 @@ import DashboardLayout from '../../layout/DashboardLayout';
 
 export default function AssistantHome() {
   return (
-    <DashboardLayout userRole="assistant" label="Assistant">
+    <DashboardLayout>
       <View style={styles.container}>
         <Text style={styles.welcomeText}>Welcome, Assistant!</Text>
       </View>
