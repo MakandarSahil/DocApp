@@ -33,15 +33,15 @@ const theme = {
   },
 };
 
-const DashboardLayout = ({ 
-  children, 
+const DashboardLayout = ({
+  children,
   loading = false,
   onRefresh,
   isRefreshing = false,
   contentContainerStyle,
   onNavigateToProfile,
 }: Props) => {
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const navigation = useNavigation();
   const [searchActive, setSearchActive] = useState(false);
   const [query, setQuery] = useState('');
@@ -80,19 +80,19 @@ const DashboardLayout = ({
           backgroundColor="#ffffff"
           translucent={Platform.OS === 'android'}
         />
-        
+
         <DashboardNavbar
           label={user ? `Welcome, ${user.username}` : 'Welcome'}
           userRole={userRole}
           showSearch={searchActive}
           searchValue={query}
           onSearchChange={handleSearchChange}
-          onToggleSearch={toggleSearch} 
+          onToggleSearch={toggleSearch}
           onNavigateToProfile={onNavigateToProfile}
           {...navHandlers}
         />
 
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           style={styles.keyboardView}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
@@ -102,23 +102,9 @@ const DashboardLayout = ({
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
           ) : (
-            <ScrollView
-              contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                onRefresh ? (
-                  <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={onRefresh}
-                    colors={['#2563EB']}
-                    tintColor="#2563EB"
-                  />
-                ) : undefined
-              }
-            >
+            <View style={[styles.scrollContent, contentContainerStyle]}>
               {children}
-            </ScrollView>
+            </View>
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>
