@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       const authUrl = config.API_URL + "/auth/get-session";
       const response = await axios.get(authUrl, { withCredentials: true });
+      //TODO: local storage setup for jwt token
       setUser(response.data.user);
     } catch (error) {
       setUser(null)
@@ -67,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       console.log("response", response.data);
+      //TODO: local storage setup for jwt token
       setUser(response.data.user);
       console.log(response.data.user)
     } catch (error: any) {
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const logoutUrl = config.API_URL + "/auth/logout";
       await axios.post(logoutUrl, { withCredentials: true });
+      //TODO: local storage cleanup
       setUser(null);
     } catch (error) {
       console.log(error);
