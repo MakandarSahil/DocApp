@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+
 //@ts-ignore
 import config from "../utils/config"
 // AuthContext.tsx
@@ -19,18 +21,39 @@ type AuthContextType = {
   user: UserType | null;
   login: (username: string, password: string, deviceToken: string) => Promise<void>;
   logout: () => Promise<void>;
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   login: async () => { },
   logout: async () => { },
+  loading: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserType | null>(null);
+
+
+  const checkAuthStatus = async () => {
+    try {
+      setLoading(true);
+      const authUrl = config.API_URL + "/auth/get-session";
+      const response = await axios.get(authUrl, { withCredentials: true });
+      setUser(response.data.user);
+    } catch (error) {
+      setUser(null)
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
 
   const login = async (username: string, password: string, deviceToken: string) => {
 
@@ -43,25 +66,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         deviceToken
       });
 
-      if (response.status === 200) {
-        console.log("response", response.data);
-        setUser(response.data.user);
-      }
-
-
-      console.log(user)
+      console.log("response", response.data);
+      setUser(response.data.user);
+      console.log(response.data.user)
     } catch (error: any) {
+      setUser(null);
       console.log("error : ", error.response.data.message);
     }
   };
 
   const logout = async () => {
-    setUser(null);
-    console.log(user)
+    try {
+      const logoutUrl = config.API_URL + "/auth/logout";
+      await axios.post(logoutUrl, { withCredentials: true });
+      setUser(null);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

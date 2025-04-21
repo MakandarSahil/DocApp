@@ -46,13 +46,13 @@ const DashboardLayout = ({
   const [searchActive, setSearchActive] = useState(false);
   const [query, setQuery] = useState('');
 
-  // Type guard for user role
-  const getUserRole = (): 'admin' | 'approver' | 'assistant' | undefined => {
-    if (!user?.role) return undefined;
-    return user.role.toLowerCase() as 'admin' | 'approver' | 'assistant';
-  };
+  // // Type guard for user role
+  // const getUserRole = (): 'admin' | 'approver' | 'assistant' | undefined => {
+  //   if (!user?.role) return undefined;
+  //   return user.role.toLowerCase() as 'admin' | 'approver' | 'assistant';
+  // };
 
-  const userRole = getUserRole();
+  const userRole: 'admin' | 'approver' | 'assistant' | undefined = user?.role;
 
   const navHandlers = useMemo(() => ({
     onManageUsers: () => userRole === 'admin' && console.log('Manage Users'),

@@ -24,29 +24,17 @@ const user = {
 const ProfileScreen = () => {
   const { logout } = useAuth();
   const navigation = useNavigation();
-  
+
   const handleBackPress = () => {
     navigation.goBack();
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      // Reset navigation stack and go to Login screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }], // Replace 'Login' with your actual login screen name
-      });
-    } catch (error) {
-      console.error('Logout failed:', error);
-      Alert.alert('Error', 'Failed to logout. Please try again.');
-    }
-  };
+  const handleLogout = async () => await logout();
 
   const handleNotifications = () => {
     console.log('notification'); // Adjust as needed for your app's navigation structure
   };
-  
+
   const handleCall = () => Linking.openURL(`tel:${user.phone}`);
   const handleWhatsApp = () => Linking.openURL(`https://wa.me/${user.phone.replace(/[^0-9]/g, '')}`);
 
@@ -90,7 +78,7 @@ const ProfileScreen = () => {
         {/* Personal Info Card */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
-          
+
           <View style={styles.cardRow}>
             <View style={styles.infoIconContainer}>
               <Ionicons name="call-outline" size={20} color="#0ea5e9" />
@@ -100,7 +88,7 @@ const ProfileScreen = () => {
               <Text style={styles.cardValue}>{user.phone}</Text>
             </View>
           </View>
-          
+
           <View style={styles.cardRow}>
             <View style={styles.infoIconContainer}>
               <Ionicons name="calendar-outline" size={20} color="#0ea5e9" />
@@ -110,7 +98,7 @@ const ProfileScreen = () => {
               <Text style={styles.cardValue}>{user.birthDate}</Text>
             </View>
           </View>
-          
+
           <View style={styles.cardRow}>
             <View style={styles.infoIconContainer}>
               <Ionicons name="person-outline" size={20} color="#0ea5e9" />
@@ -120,7 +108,7 @@ const ProfileScreen = () => {
               <Text style={styles.cardValue}>{user.gender}</Text>
             </View>
           </View>
-          
+
           <View style={styles.cardRow}>
             <View style={styles.infoIconContainer}>
               <Ionicons name="location-outline" size={20} color="#0ea5e9" />
@@ -158,12 +146,12 @@ const ProfileScreen = () => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1, 
-    backgroundColor: '#f8fafc' 
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8fafc'
   },
-  scrollContainer: { 
-    paddingBottom: 24 
+  scrollContainer: {
+    paddingBottom: 24
   },
   header: {
     paddingVertical: 24,
