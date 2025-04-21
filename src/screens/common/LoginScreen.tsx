@@ -43,7 +43,7 @@ const LoginScreen: React.FC = () => {
     { setSubmitting }: FormikHelpers<LoginFormValues>
   ) => {
     try {
-      await login(values.username, values.password);
+      await login(values.username, values.password, "asdfghjklsdfghjk");
     } catch (error) {
       console.error('Login error:', error);
     } finally {
@@ -66,7 +66,7 @@ const LoginScreen: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <KeyboardAvoidingView
-        style={{ flex: 1 ,  backgroundColor: '#f4f6f8'}}
+        style={{ flex: 1, backgroundColor: '#f4f6f8' }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
