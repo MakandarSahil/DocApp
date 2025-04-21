@@ -17,6 +17,7 @@ import {
 import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 // Types
@@ -35,6 +36,7 @@ const LoginSchema = Yup.object().shape({
 
 const LoginScreen: React.FC = () => {
   const { login } = useAuth();
+  const { fcmToken } = useNotification();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const passwordInputRef = useRef<TextInput>(null);
 
@@ -43,7 +45,7 @@ const LoginScreen: React.FC = () => {
     { setSubmitting }: FormikHelpers<LoginFormValues>
   ) => {
     try {
-      await login(values.username, values.password, "asdfghjklsdfghjk");
+      await login(values.username, values.password, fcmToken);
     } catch (error) {
       console.error('Login error:', error);
     } finally {

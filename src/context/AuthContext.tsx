@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-
 //@ts-ignore
 import config from "../utils/config"
 // AuthContext.tsx
