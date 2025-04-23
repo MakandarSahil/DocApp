@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,17 +11,25 @@ import { Alert } from 'react-native';
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
 
-const user = {
-  name: 'Sahil Makandar',
-  initials: 'SM',
-  role: 'Admin',
-  phone: '+91-9579891114',
-  birthDate: '1/23/2005',
-  gender: 'Male',
-  location: 'India, 416 410',
-};
+// const user = {
+//   name: 'Sahil Makandar',
+//   initials: 'SM',
+//   role: 'Admin',
+//   phone: '+91-9579891114',
+//   birthDate: '1/23/2005',
+//   gender: 'Male',
+//   location: 'India, 416 410',
+// };
 
 const ProfileScreen = () => {
+
+  const { user } = useAuth();
+
+  const initials = useMemo(() => {
+    return user?.fullName?.split(' ')?.[0]?.charAt(0).toUpperCase();
+  }, [user]);
+
+  console.log(user)
   const { logout } = useAuth();
   const navigation = useNavigation();
 
@@ -35,8 +43,8 @@ const ProfileScreen = () => {
     console.log('notification'); // Adjust as needed for your app's navigation structure
   };
 
-  const handleCall = () => Linking.openURL(`tel:${user.phone}`);
-  const handleWhatsApp = () => Linking.openURL(`https://wa.me/${user.phone.replace(/[^0-9]/g, '')}`);
+  const handleCall = () => Linking.openURL(`tel:+91 9579891114`);
+  const handleWhatsApp = () => Linking.openURL(`https://wa.me/9579891114/g, '')}`);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -49,12 +57,12 @@ const ProfileScreen = () => {
 
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{user.initials}</Text>
+              <Text style={styles.avatarText}>{initials}</Text>
             </View>
-            <Text style={styles.userName}>{user.name}</Text>
+            <Text style={styles.userName}>{user?.fullName}</Text>
             <View style={styles.roleBadge}>
               <Ionicons name="heart" size={14} color="white" />
-              <Text style={styles.roleText}>{user.role}</Text>
+              <Text style={styles.roleText}>{user?.role}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -85,7 +93,7 @@ const ProfileScreen = () => {
             </View>
             <View>
               <Text style={styles.cardLabel}>Mobile Number</Text>
-              <Text style={styles.cardValue}>{user.phone}</Text>
+              <Text style={styles.cardValue}>{user?.mobileNo}</Text>
             </View>
           </View>
 
@@ -95,7 +103,7 @@ const ProfileScreen = () => {
             </View>
             <View>
               <Text style={styles.cardLabel}>Birth Date</Text>
-              <Text style={styles.cardValue}>{user.birthDate}</Text>
+              <Text style={styles.cardValue}>Birthday</Text>
             </View>
           </View>
 
@@ -105,7 +113,7 @@ const ProfileScreen = () => {
             </View>
             <View>
               <Text style={styles.cardLabel}>Gender</Text>
-              <Text style={styles.cardValue}>{user.gender}</Text>
+              <Text style={styles.cardValue}>Male</Text>
             </View>
           </View>
 
@@ -115,7 +123,7 @@ const ProfileScreen = () => {
             </View>
             <View>
               <Text style={styles.cardLabel}>Location</Text>
-              <Text style={styles.cardValue}>{user.location}</Text>
+              <Text style={styles.cardValue}>Location</Text>
             </View>
           </View>
         </View>

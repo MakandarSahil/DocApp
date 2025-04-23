@@ -3,22 +3,21 @@ import { FlatList, Text, View, StyleSheet, ActivityIndicator } from 'react-nativ
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document'; // Import the shared interface
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
   documents: Document[];
   status: string;
-  userRole: string;
   onPreview: (document: Document) => void;
   onDownload: (document: Document) => void;
   isLoading?: boolean;
   query?: string;
 }
 
-const DocumentList: React.FC<Props> = ({ 
-  documents, 
-  status, 
-  userRole, 
-  onPreview, 
+const DocumentList: React.FC<Props> = ({
+  documents,
+  status,
+  onPreview,
   onDownload,
   isLoading = false,
   query = ''
@@ -33,20 +32,22 @@ const DocumentList: React.FC<Props> = ({
     );
   }
 
+  const userRole = useAuth()?.user?.role;
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
         {status.charAt(0).toUpperCase() + status.slice(1)} Documents ({documents.length})
       </Text>
-      
+
       <FlatList
         data={documents}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
         renderItem={({ item }) => (
-          <DocumentItem 
-            document={item} 
-            onPreview={onPreview} 
-            onDownload={onDownload} 
+          <DocumentItem
+            document={item}
+            onPreview={onPreview}
+            onDownload={onDownload}
           />
         )}
         contentContainerStyle={[

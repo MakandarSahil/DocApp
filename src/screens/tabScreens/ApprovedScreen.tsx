@@ -1,38 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import DocumentList from '../../components/DocumenList'; 
+import DocumentList from '../../components/DocumenList';
 import { getFilteredDocuments } from '../../mock/data/DummyDoc';
 import { downloadDocument } from '../../utils/documentHandlers';
 import { Document } from '../../types/document';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { useAuth } from '../../context/AuthContext';
+import { useDocuments } from '../../context/DocumentsContext';
 
 interface Props {
   query: string;
-  userRole?: 'admin' | 'approver' | 'assistant';
 }
 
-const ApprovedScreen: React.FC<Props> = ({ query, userRole }) => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const status = 'approved';
+const ApprovedScreen: React.FC<Props> = ({ query }) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  useEffect(() => {
-    if (!userRole) return;
+  const { documents, loading, setStatus, status } = useDocuments()
 
-    setLoading(true);
-    const filtered = getFilteredDocuments(status, userRole, query);
-    setDocuments(filtered);
-
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [status, userRole, query]);
+  useFocusEffect(
+    useCallback(() => {
+      setStatus('approved');
+    }, [])
+  );
 
   const handlePreview = (document: Document) => {
     navigation.navigate('DocumentDetails', { document });
@@ -41,7 +33,7 @@ const ApprovedScreen: React.FC<Props> = ({ query, userRole }) => {
   const handleDownload = (document: Document) => {
     try {
       downloadDocument(document);
-      Alert.alert("Download Started", `${document.name} is being downloaded.`);
+      Alert.alert("Download Started", `${document.title} is being downloaded.`);
     } catch (error) {
       Alert.alert("Download Error", "Unable to download this document. Please try again later.");
     }
@@ -49,9 +41,8 @@ const ApprovedScreen: React.FC<Props> = ({ query, userRole }) => {
 
   return (
     <View style={styles.container}>
-      <DocumentList 
-        documents={documents} 
-        userRole={userRole || ''} 
+      <DocumentList
+        documents={documents}
         status={status}
         onPreview={handlePreview}
         onDownload={handleDownload}

@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
 const createScreenWrapper = (
-  ScreenComponent: React.ComponentType<{ query: string; userRole?: 'admin' | 'approver' | 'assistant' }>
+  ScreenComponent: React.ComponentType<{ query: string }>
 ) => {
   return () => {
     const navigation = useNavigation();
@@ -24,13 +24,9 @@ const createScreenWrapper = (
 
     return (
       <DashboardLayout onNavigateToProfile={handleProfilePress}>
-        {({ query, userRole }) => {
-          const validUserRole = ['admin', 'approver', 'assistant'].includes(userRole || '')
-            ? (userRole as 'admin' | 'approver' | 'assistant')
-            : undefined;
-
+        {({ query }) => {
           return (
-            <ScreenComponent query={query} userRole={validUserRole} />
+            <ScreenComponent query={query} />
           );
         }}
       </DashboardLayout>
@@ -48,23 +44,23 @@ export default function BottomTabs() {
       }}
     >
       {/* <Tab.Screen name="Profile" component={ProfileScreen} /> */}
-      <Tab.Screen 
-        name="Pending" 
+      <Tab.Screen
+        name="Pending"
         component={createScreenWrapper(PendingScreen)}
         options={{ tabBarLabel: 'Pending' }}
       />
-      <Tab.Screen 
-        name="Approved" 
+      <Tab.Screen
+        name="Approved"
         component={createScreenWrapper(ApprovedScreen)}
         options={{ tabBarLabel: 'Approved' }}
       />
-      <Tab.Screen 
-        name="Correction" 
+      <Tab.Screen
+        name="Correction"
         component={createScreenWrapper(CorrectionScreen)}
         options={{ tabBarLabel: 'Correction' }}
       />
-      <Tab.Screen 
-        name="Rejected" 
+      <Tab.Screen
+        name="Rejected"
         component={createScreenWrapper(RejectedScreen)}
         options={{ tabBarLabel: 'Rejected' }}
       />

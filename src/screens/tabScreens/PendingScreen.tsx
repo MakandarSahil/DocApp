@@ -1,38 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import DocumentList from '../../components/DocumenList'; 
-import { getFilteredDocuments } from '../../mock/data/DummyDoc';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, StyleSheet, Alert, Text } from 'react-native';
+import DocumentList from '../../components/DocumenList';
+import { dummyDocuments, getFilteredDocuments } from '../../mock/data/DummyDoc';
 import { downloadDocument } from '../../utils/documentHandlers';
 import { Document } from '../../types/document';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { useAuth } from '../../context/AuthContext';
+import { useDocuments } from "../../context/DocumentsContext"
+import { ActivityIndicator } from 'react-native-paper';
 
 interface Props {
   query: string;
-  userRole?: 'admin' | 'approver' | 'assistant';
 }
 
-const PendingScreen: React.FC<Props> = ({ query, userRole }) => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const status = 'pending';
+const PendingScreen: React.FC<Props> = ({ query }) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  useEffect(() => {
-    if (!userRole) return;
+  const { documents, loading, setStatus, status, isLoading } = useDocuments()
 
-    setLoading(true);
-    const filtered = getFilteredDocuments(status, userRole, query);
-    setDocuments(filtered);
 
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 500);
+  useFocusEffect(
+    useCallback(() => {
+      setStatus('pending');
+    }, [])
+  );
 
-    return () => clearTimeout(timeout);
-  }, [status, userRole, query]);
+
 
   const handlePreview = (document: Document) => {
     navigation.navigate('DocumentDetails', { document });
@@ -41,7 +37,7 @@ const PendingScreen: React.FC<Props> = ({ query, userRole }) => {
   const handleDownload = (document: Document) => {
     try {
       downloadDocument(document);
-      Alert.alert("Download Started", `${document.name} is being downloaded.`);
+      Alert.alert("Download Started", `${document.title} is being downloaded.`);
     } catch (error) {
       Alert.alert("Download Error", "Unable to download this document. Please try again later.");
     }
@@ -49,15 +45,22 @@ const PendingScreen: React.FC<Props> = ({ query, userRole }) => {
 
   return (
     <View style={styles.container}>
-      <DocumentList 
-        documents={documents} 
-        userRole={userRole || ''} 
-        status={status}
-        onPreview={handlePreview}
-        onDownload={handleDownload}
-        isLoading={loading}
-        query={query}
-      />
+      {/* <Text>hii from pending screen</Text> */}
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text style={styles.loadingText}>Loading documents...</Text>
+        </View>
+      ) : (
+        <DocumentList
+          documents={documents}
+          status={status}
+          onPreview={handlePreview}
+          onDownload={handleDownload}
+          isLoading={loading}
+          query={query}
+        />
+      )}
     </View>
   );
 };
@@ -67,6 +70,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6B7280',
+  }
 });
 
 export default PendingScreen;

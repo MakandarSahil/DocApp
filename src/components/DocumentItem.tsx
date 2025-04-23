@@ -15,22 +15,23 @@ const DocumentItem: React.FC<DocumentItemProps> = ({ document, onPreview, onDown
       <View style={styles.documentInfo}>
         <Icon name="file-document-outline" size={28} color="#4B5563" style={styles.fileIcon} />
         <View style={styles.textContainer}>
-          <Text style={styles.documentName}>{document.name}</Text>
+          <Text style={styles.documentName}>{document.title}</Text>
           <View style={styles.metaInfo}>
-            <Text style={styles.metaText}>{document.date}</Text>
-            <View style={[styles.statusBadge, 
-              document.status === 'approved' ? styles.statusApproved :
+            <Text style={styles.metaText}>From: {document.createdBy.fullName}</Text>
+            <Text style={styles.metaText}>{new Date(document.createdDate).toLocaleDateString()}</Text>
+            <View style={[styles.statusBadge,
+            document.status === 'approved' ? styles.statusApproved :
               document.status === 'pending' ? styles.statusPending :
-              styles.statusRejected
+                styles.statusRejected
             ]}>
               <Text style={styles.statusText}>{document.status}</Text>
             </View>
           </View>
         </View>
       </View>
-      
+
       <View style={styles.actions}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.actionButton && styles.actionButton1}
           onPress={() => onPreview(document)}
           activeOpacity={0.7}
@@ -38,8 +39,8 @@ const DocumentItem: React.FC<DocumentItemProps> = ({ document, onPreview, onDown
           <Icon name="eye-outline" size={18} color="#3B82F6" />
           <Text style={styles.actionText1}>Preview</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.actionButton && styles.actionButton2}
           onPress={() => onDownload(document)}
           activeOpacity={0.7}
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1FAE5',
   },
   statusPending: {
-    backgroundColor: '#FEF3C7', 
+    backgroundColor: '#FEF3C7',
   },
   statusRejected: {
     backgroundColor: '#FEE2E2',

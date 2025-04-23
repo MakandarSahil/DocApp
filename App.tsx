@@ -4,6 +4,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import NotificationProvider from './src/context/NotificationContext';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
+import DocumentsProvider from './src/context/DocumentsContext';
 
 const App = () => {
   return (
@@ -11,7 +12,9 @@ const App = () => {
       <NotificationProvider>
         <NavigationContainer>
           <AuthProvider>
-            <AppNavigator />
+            <DocumentsProvider>
+              <AppNavigator />
+            </DocumentsProvider>
           </AuthProvider>
         </NavigationContainer>
       </NotificationProvider>

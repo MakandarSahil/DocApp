@@ -1,8 +1,12 @@
 export interface Document {
   id: string;
-  name: string;
+  title: string;
   status: 'pending' | 'approved' | 'rejected' | 'correction';
-  date: string;
+  createdDate: string;
+  createdBy: {
+    username: string;
+    fullName: string;
+  };
   role: 'admin' | 'approver' | 'assistant';
   fileUrl?: string; // Optional file preview/download link
 }

@@ -8,6 +8,7 @@ import {
   RefreshControl,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Text,
 } from 'react-native';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { useNavigation } from '@react-navigation/native';
@@ -91,6 +92,7 @@ const DashboardLayout = ({
           onNavigateToProfile={onNavigateToProfile}
           {...navHandlers}
         />
+        {/* <Text>hii from dashboard layout</Text> */}
 
         <KeyboardAvoidingView
           style={styles.keyboardView}
@@ -103,7 +105,7 @@ const DashboardLayout = ({
             </View>
           ) : (
             <View style={[styles.scrollContent, contentContainerStyle]}>
-              {children({ query, userRole })}
+              {children({ query })}
             </View>
           )}
         </KeyboardAvoidingView>
