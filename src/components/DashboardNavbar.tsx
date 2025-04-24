@@ -74,10 +74,12 @@ const DashboardNavbar = memo(({
 
   const handleViewAllDocs = () => {
     navigation.navigate('AllDocuments');
+    closeMenu();
   }
 
   const handleViewAllUsers = () => {
     navigation.navigate('AllUsers');
+    closeMenu();
   }
 
   const handleMenuItemPress = useCallback((callback?: () => void) => {

@@ -1,9 +1,9 @@
-import { View } from 'react-native'
-import React, { useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import DashboardNavbar from '../../components/DashboardNavbar'
-import { useAuth } from '../../context/AuthContext'
-import DocumentList from '../../components/DocumenList'
+import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import DashboardNavbar from '../../components/DashboardNavbar';
+import { useAuth } from '../../context/AuthContext';
+import UsersList from '../../components/UsersList';
 
 const AllUsers = () => {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ const AllUsers = () => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <DashboardNavbar
         label='All Users'
         showSearch={searchActive}
@@ -33,8 +33,16 @@ const AllUsers = () => {
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
       />
+      <UsersList query={query} />
     </View>
-  )
-}
+  );
+};
 
-export default AllUsers
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, // This is important for layout
+    backgroundColor: '#fff',
+  },
+});
+
+export default AllUsers;

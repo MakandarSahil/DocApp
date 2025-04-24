@@ -41,7 +41,7 @@ const AllDocuments = () => {
         onBackPress={() => navigation.goBack()}
       />
 
-      <View style={{ paddingHorizontal: 16, flex: 1, marginTop: 8 }}>
+      <View style={{ paddingHorizontal: 16, flex: 1, paddingTop: 14, backgroundColor: '#FFFFFF', paddingBottom: 16 }}>
         <DocumentList query={query} isAllDocsScreen={true} />
       </View>
     </SafeAreaView>
