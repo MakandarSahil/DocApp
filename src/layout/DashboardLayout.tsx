@@ -43,22 +43,14 @@ const DashboardLayout = ({
   onNavigateToProfile,
 }: Props) => {
   const { user, logout } = useAuth();
-  const navigation = useNavigation();
   const [searchActive, setSearchActive] = useState(false);
   const [query, setQuery] = useState('');
 
-  // // Type guard for user role
-  // const getUserRole = (): 'admin' | 'approver' | 'assistant' | undefined => {
-  //   if (!user?.role) return undefined;
-  //   return user.role.toLowerCase() as 'admin' | 'approver' | 'assistant';
-  // };
 
   const userRole: 'admin' | 'approver' | 'assistant' | undefined = user?.role;
 
   const navHandlers = useMemo(() => ({
     onManageUsers: () => userRole === 'admin' && console.log('Manage Users'),
-    // // onViewAllDocs: () => userRole === 'approver' && console.log('All Docs'),
-    // onViewAllUsers: () => userRole === 'approver' && console.log('All Users'),
     onViewHistory: () => userRole === 'approver' && console.log('View History'),
     onLogout: () => logout(),
   }), [userRole, logout]);

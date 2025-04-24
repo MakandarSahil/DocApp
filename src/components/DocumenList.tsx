@@ -19,14 +19,7 @@ interface Props {
   query?: string;
 }
 
-const DocumentList: React.FC<Props> = ({
-  // documents,
-  // status,
-  // onPreview,
-  // onDownload,
-  // isLoading = false,
-  query = ''
-}) => {
+const DocumentList: React.FC<Props> = ({ query }) => {
 
   const { documents, isLoading, status, } = useDocuments();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -44,6 +37,12 @@ const DocumentList: React.FC<Props> = ({
     }
   };
 
+  const filterDocument = query
+    ? documents.filter((doc: Document) =>
+      doc.title.toLowerCase().includes(query.toLowerCase())
+    )
+    : documents;
+
   // Loading state
   if (isLoading) {
     return (
@@ -59,11 +58,11 @@ const DocumentList: React.FC<Props> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
-        {status.charAt(0).toUpperCase() + status.slice(1)} Documents ({documents.length})
+        {status.charAt(0).toUpperCase() + status.slice(1)} Documents ({filterDocument.length})
       </Text>
 
       <FlatList
-        data={documents}
+        data={filterDocument}
         keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
         renderItem={({ item }) => (
           <DocumentItem
