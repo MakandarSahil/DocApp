@@ -64,7 +64,7 @@ const PendingScreen: React.FC<Props> = ({ query }) => {
           query={query}
         />
       )} */}
-      <DocumentList query={query} />
+      {/* <DocumentList query={query} /> */}
     </View>
   );
 };

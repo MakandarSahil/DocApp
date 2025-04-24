@@ -17,9 +17,10 @@ interface Props {
   // onDownload: (document: Document) => void;
   // isLoading?: boolean;
   query?: string;
+  isAllDocsScreen?: boolean;
 }
 
-const DocumentList: React.FC<Props> = ({ query }) => {
+const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
 
   const { documents, isLoading, status, } = useDocuments();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -58,7 +59,9 @@ const DocumentList: React.FC<Props> = ({ query }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
-        {status.charAt(0).toUpperCase() + status.slice(1)} Documents ({filterDocument.length})
+        {isAllDocsScreen
+          ? 'All Documents'
+          : `${status.charAt(0).toUpperCase() + status.slice(1)} Documents (${filterDocument.length})`}
       </Text>
 
       <FlatList
