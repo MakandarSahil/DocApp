@@ -11,6 +11,9 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Menu } from 'react-native-paper';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigationTypes';
+import { useNavigation } from '@react-navigation/native';
 
 
 type UserRole = 'admin' | 'approver' | 'assistant';
@@ -22,11 +25,12 @@ interface Props {
   onSearchChange?: (text: string) => void;
   onToggleSearch?: () => void;
   onNavigateToProfile?: () => void;
+  // onViewAllDocs?: () => void;
   onManageUsers?: () => void;
-  onViewAllUsers?: () => void;
+  // onViewAllUsers?: () => void;
   onViewHistory?: () => void;
   onLogout?: () => void;
-  userRole?: UserRole; 
+  userRole?: UserRole;
 }
 
 const DashboardNavbar = memo(({
@@ -36,16 +40,17 @@ const DashboardNavbar = memo(({
   onSearchChange,
   onToggleSearch,
   onNavigateToProfile,
+  // onViewAllDocs,
   onManageUsers,
   onLogout,
-  onViewAllUsers,
+  // onViewAllUsers,
   onViewHistory,
   userRole,
 }: Props) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  
+
   // Animation when search toggle happens
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -57,13 +62,24 @@ const DashboardNavbar = memo(({
 
   const closeMenu = useCallback(() => setMenuVisible(false), []);
   const openMenu = useCallback(() => setMenuVisible(true), []);
-  
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const handleViewAllDocs = () => {
+    navigation.navigate('AllDocuments');
+  }
+
+  const handleViewAllUsers = () => {
+    navigation.navigate('AllUsers');
+  }
+
   const handleMenuItemPress = useCallback((callback?: () => void) => {
     return () => {
       closeMenu();
       callback?.();
     };
   }, [closeMenu]);
+
 
   // Memoized menu items based on user role
   const renderMenuItems = useCallback(() => {
@@ -88,18 +104,28 @@ const DashboardNavbar = memo(({
         />
       );
     }
-    
+
     if (userRole === 'approver') {
       items.push(
         <Menu.Item
+          key="all-docs"
+          onPress={() => handleViewAllDocs()}
+          title="All Docs"
+          titleStyle={styles.menuItemText}
+          leadingIcon={() => <Ionicons name="document-text-outline" size={20} color="#4B5563" />}
+        />
+      );
+
+      items.push(
+        <Menu.Item
           key="all-users"
-          onPress={handleMenuItemPress(onViewAllUsers)}
+          onPress={() => handleViewAllUsers()}
           title="All Users"
           titleStyle={styles.menuItemText}
           leadingIcon={() => <Ionicons name="list-outline" size={20} color="#4B5563" />}
         />
       );
-      
+
       items.push(
         <Menu.Item
           key="history"
@@ -110,7 +136,7 @@ const DashboardNavbar = memo(({
         />
       );
     }
-    
+
     items.push(
       <Menu.Item
         key="logout"
@@ -120,9 +146,9 @@ const DashboardNavbar = memo(({
         leadingIcon={() => <Ionicons name="log-out-outline" size={20} color="#dc3545" />}
       />
     );
-    
+
     return items;
-  }, [userRole, handleMenuItemPress, onNavigateToProfile, onManageUsers, onViewAllUsers, onViewHistory, onLogout]);
+  }, [userRole, handleMenuItemPress, onNavigateToProfile, onManageUsers, onViewHistory, onLogout]);
 
   return (
     <SafeAreaView style={[
@@ -172,7 +198,7 @@ const DashboardNavbar = memo(({
       </View>
 
       {/* Right: Search Icon */}
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={onToggleSearch}
         style={styles.iconButton}
         activeOpacity={0.7}

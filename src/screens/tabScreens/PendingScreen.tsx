@@ -19,48 +19,52 @@ const PendingScreen: React.FC<Props> = ({ query }) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { documents, loading, setStatus, status, isLoading } = useDocuments()
+  // const { documents, loading, setStatus, status, isLoading } = useDocuments()
 
 
-  useFocusEffect(
-    useCallback(() => {
-      setStatus('pending');
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setStatus('pending');
+  //   }, [])
+  // );
 
 
 
-  const handlePreview = (document: Document) => {
-    navigation.navigate('DocumentDetails', { document });
-  };
+  // const handlePreview = (document: Document) => {
+  //   navigation.navigate('DocumentDetails', { document });
+  // };
 
-  const handleDownload = (document: Document) => {
-    try {
-      downloadDocument(document);
-      Alert.alert("Download Started", `${document.title} is being downloaded.`);
-    } catch (error) {
-      Alert.alert("Download Error", "Unable to download this document. Please try again later.");
-    }
-  };
+  // const handleDownload = (document: Document) => {
+  //   try {
+  //     downloadDocument(document);
+  //     Alert.alert("Download Started", `${document.title} is being downloaded.`);
+  //   } catch (error) {
+  //     Alert.alert("Download Error", "Unable to download this document. Please try again later.");
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
       {/* <Text>hii from pending screen</Text> */}
-      {isLoading ? (
+      {/* {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Loading documents...</Text>
         </View>
       ) : (
+        // <DocumentList
+        //   documents={documents}
+        //   status={status}
+        //   onPreview={handlePreview}
+        //   onDownload={handleDownload}
+        //   isLoading={loading}
+        //   query={query}
+        // />
         <DocumentList
-          documents={documents}
-          status={status}
-          onPreview={handlePreview}
-          onDownload={handleDownload}
-          isLoading={loading}
           query={query}
         />
-      )}
+      )} */}
+      <DocumentList query={query} />
     </View>
   );
 };

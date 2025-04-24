@@ -32,10 +32,10 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [pdfLoading, setPdfLoading] = useState<boolean>(true);
   const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
-  
+
   const scrollViewRef = useRef<ScrollView>(null);
   const remarksInputRef = useRef<TextInput>(null);
-  
+
   // Animation values
   const pdfHeight = useRef(new Animated.Value(400)).current;
   const screenHeight = Dimensions.get('window').height;
@@ -52,14 +52,14 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           duration: 300,
           useNativeDriver: false,
         }).start();
-        
+
         // Scroll to remarks input
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
       }
     );
-    
+
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
@@ -95,8 +95,8 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       Alert.alert(
         "Remarks Required",
         "Please provide remarks for rejection or correction request.",
-        [{ 
-          text: "OK", 
+        [{
+          text: "OK",
           onPress: () => {
             remarksInputRef.current?.focus();
             setTimeout(() => {
@@ -133,7 +133,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const currentStatus = document.status.toLowerCase() as keyof typeof statusStyles;
-  
+
   const focusRemarksInput = () => {
     remarksInputRef.current?.focus();
     setTimeout(() => {
@@ -159,12 +159,12 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
             Document Details
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.headerRightButton}
             onPress={() => {
               Alert.alert(
                 "Document Information",
-                `Name: ${document.name}\nStatus: ${document.status}\nDate: ${document.date}\nRole: ${document.role}`,
+                `Name: ${document.title}\nStatus: ${document.status}\nDate: ${new Date(document.createdDate).toLocaleDateString()}\nRole: ${document.role}`,
                 [{ text: "OK" }]
               );
             }}
@@ -193,7 +193,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               <Icon name="file-document-outline" size={24} color="#4B5563" style={styles.infoIcon} />
               <View style={styles.infoContent}>
                 <Text style={styles.documentName} numberOfLines={2} ellipsizeMode="tail">
-                  {document.name}
+                  {document.title}
                 </Text>
 
                 <View style={styles.metaRow}>
@@ -214,14 +214,14 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>Date:</Text>
                   <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="tail">
-                    {document.date}
+                    {new Date(document.createdDate).toLocaleDateString()}
                   </Text>
                 </View>
 
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>Role:</Text>
                   <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="tail">
-                    {document.role}
+                    {document.createdBy.fullName}
                   </Text>
                 </View>
               </View>
@@ -232,7 +232,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               <View style={styles.sectionTitleRow}>
                 <Text style={styles.sectionTitle}>Document Preview</Text>
                 {isKeyboardVisible && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.expandButton}
                     onPress={() => Keyboard.dismiss()}
                   >
@@ -243,12 +243,12 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               </View>
 
               <View style={styles.pdfWrapper}>
-                {pdfLoading && (
+                {/* {pdfLoading && (
                   <View style={styles.pdfLoading}>
                     <ActivityIndicator size="large" color="#3B82F6" />
                     <Text style={styles.loadingText}>Loading document...</Text>
                   </View>
-                )}
+                )} */}
 
                 <View style={styles.pdfPlaceholder}>
                   <Icon name="file-pdf-box" size={48} color="#E5E7EB" />
@@ -273,7 +273,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <View style={styles.remarksContainer}>
               <View style={styles.sectionTitleRow}>
                 <Text style={styles.sectionTitle}>Remarks</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.addRemarksButton}
                   onPress={focusRemarksInput}
                 >
@@ -296,7 +296,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 returnKeyType="default"
               />
             </View>
-            
+
             {/* Extra padding at bottom for keyboard */}
             {/* <View style={{ height: Platform.OS === 'ios' ? 120 : 150 }} /> */}
           </ScrollView>

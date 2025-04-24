@@ -1,28 +1,28 @@
-import messaging from '@react-native-firebase/messaging';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
-import axios from 'axios';
+import { getApp } from '@react-native-firebase/app';
+import { getMessaging, requestPermission as requestMessagingPermission, getToken, onMessage, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
 
-export const requestPermission = async ():Promise<void> => {
+const messaging = getMessaging(getApp());
+
+export const requestPermission = async (): Promise<void> => {
   if (Platform.OS === 'android') {
     await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
   }
-  await messaging().requestPermission();
+  await requestMessagingPermission(messaging);
 };
 
-export const getFCMToken = async () => {
-  const token = await messaging().getToken();
+export const getFCMToken = async (): Promise<string> => {
+  const token = await getToken(messaging);
   console.log('FCM Token:', token);
   return token;
 };
 
 export const setupListeners = () => {
-  // Foreground messages
-  messaging().onMessage(async remoteMessage => {
+  onMessage(messaging, async remoteMessage => {
     Alert.alert('New Notification', remoteMessage.notification?.title || '');
   });
 
-  // Background/quit state messages (optional for tracking if user clicked)
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('Message handled in background!', remoteMessage);
+  setBackgroundMessageHandler(messaging, async remoteMessage => {
+    console.log('Handled in background:', remoteMessage);
   });
 };

@@ -10,12 +10,16 @@ import DocumentDetailsScreen from '../screens/common/DocumentDetailScreen';
 
 import { useAuth } from '../context/AuthContext';
 import { Document } from '../types/document';
+import AllDocuments from '../screens/common/AllDocuments';
+import AllUsers from '../screens/common/AllUsers';
 
 export type RootStackParamList = {
   Login: undefined;
   MainApp: undefined;
   Profile: undefined;
   DocumentDetails: { document: Document };
+  AllDocuments: undefined;
+  AllUsers: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,6 +45,8 @@ const AppNavigator = () => {
           <Stack.Screen name="MainApp" component={BottomTabs} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="DocumentDetails" component={DocumentDetailsScreen} />
+          <Stack.Screen name="AllDocuments" component={AllDocuments} />
+          <Stack.Screen name="AllUsers" component={AllUsers} />
         </>
       )}
     </Stack.Navigator>

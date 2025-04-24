@@ -1,27 +1,49 @@
 import React from 'react';
-import { FlatList, Text, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document'; // Import the shared interface
 import { useAuth } from '../context/AuthContext';
+import { useDocuments } from '../context/DocumentsContext';
+import { useNavigation } from '@react-navigation/native';
+import { downloadDocument } from '../utils/documentHandlers';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 interface Props {
-  documents: Document[];
-  status: string;
-  onPreview: (document: Document) => void;
-  onDownload: (document: Document) => void;
-  isLoading?: boolean;
+  // documents: Document[];
+  // status: string;
+  // onPreview: (document: Document) => void;
+  // onDownload: (document: Document) => void;
+  // isLoading?: boolean;
   query?: string;
 }
 
 const DocumentList: React.FC<Props> = ({
-  documents,
-  status,
-  onPreview,
-  onDownload,
-  isLoading = false,
+  // documents,
+  // status,
+  // onPreview,
+  // onDownload,
+  // isLoading = false,
   query = ''
 }) => {
+
+  const { documents, isLoading, status, } = useDocuments();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const handlePreview = (document: Document) => {
+    navigation.navigate('DocumentDetails', { document });
+  };
+
+  const handleDownload = (document: Document) => {
+    try {
+      downloadDocument(document);
+      Alert.alert("Download Started", `${document.title} is being downloaded.`);
+    } catch (error) {
+      Alert.alert("Download Error", "Unable to download this document. Please try again later.");
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -46,8 +68,8 @@ const DocumentList: React.FC<Props> = ({
         renderItem={({ item }) => (
           <DocumentItem
             document={item}
-            onPreview={onPreview}
-            onDownload={onDownload}
+            onPreview={handlePreview}
+            onDownload={handleDownload}
           />
         )}
         contentContainerStyle={[
@@ -62,7 +84,7 @@ const DocumentList: React.FC<Props> = ({
             </Text>
             {query ? (
               <Text style={styles.emptySubText}>
-                Try adjusting your search query.
+                Check Search Spelling
               </Text>
             ) : null}
           </View>
