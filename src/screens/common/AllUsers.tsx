@@ -1,15 +1,48 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import DashboardNavbar from '../../components/DashboardNavbar';
+import { useAuth } from '../../context/AuthContext';
+import UsersList from '../../components/UsersList';
 
 const AllUsers = () => {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>AllUsers</Text>
-      </View>
-    </SafeAreaView>
-  )
-}
+  const navigation = useNavigation();
+  const { user } = useAuth();
+  const [searchActive, setSearchActive] = useState(false);
+  const [query, setQuery] = useState('');
 
-export default AllUsers
+  const toggleSearch = () => {
+    if (searchActive && query) {
+      setQuery('');
+    }
+    setSearchActive(prev => !prev);
+  };
+
+  const handleSearchChange = (text: string) => {
+    setQuery(text);
+  };
+
+  return (
+    <View style={styles.container}>
+      <DashboardNavbar
+        label='All Users'
+        showSearch={searchActive}
+        searchValue={query}
+        onSearchChange={handleSearchChange}
+        onToggleSearch={toggleSearch}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+      <UsersList query={query} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, // This is important for layout
+    backgroundColor: '#fff',
+  },
+});
+
+export default AllUsers;

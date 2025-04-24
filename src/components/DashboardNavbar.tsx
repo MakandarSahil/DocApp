@@ -14,6 +14,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 
 
 type UserRole = 'admin' | 'approver' | 'assistant';
@@ -31,6 +32,8 @@ interface Props {
   onViewHistory?: () => void;
   onLogout?: () => void;
   userRole?: UserRole;
+  showBackButton?: boolean;
+  onBackPress?: () => void;
 }
 
 const DashboardNavbar = memo(({
@@ -45,8 +48,12 @@ const DashboardNavbar = memo(({
   onLogout,
   // onViewAllUsers,
   onViewHistory,
-  userRole,
+  showBackButton = false,
+  onBackPress,
 }: Props) => {
+
+  const userRole = useAuth()?.user?.role;
+
   const [menuVisible, setMenuVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -67,10 +74,12 @@ const DashboardNavbar = memo(({
 
   const handleViewAllDocs = () => {
     navigation.navigate('AllDocuments');
+    closeMenu();
   }
 
   const handleViewAllUsers = () => {
     navigation.navigate('AllUsers');
+    closeMenu();
   }
 
   const handleMenuItemPress = useCallback((callback?: () => void) => {
@@ -79,6 +88,7 @@ const DashboardNavbar = memo(({
       callback?.();
     };
   }, [closeMenu]);
+
 
 
   // Memoized menu items based on user role
@@ -156,24 +166,32 @@ const DashboardNavbar = memo(({
       { paddingTop: Platform.OS === 'ios' ? insets.top : 8 }
     ]}>
       {/* Left: Menu */}
-      <Menu
-        visible={menuVisible}
-        onDismiss={closeMenu}
-        anchor={
-          <View collapsable={false}>
-            <TouchableOpacity
-              onPress={openMenu}
-              style={styles.menuIcon}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="menu-outline" size={28} color="#4B5563" />
-            </TouchableOpacity>
-          </View>
-        }
-        contentStyle={styles.menuContent}
-      >
-        {renderMenuItems()}
-      </Menu>
+      {
+        showBackButton ? (
+          <TouchableOpacity onPress={onBackPress} style={styles.menuIcon}>
+            <Ionicons name="arrow-back-outline" size={28} color="#4B5563" />
+          </TouchableOpacity>
+        ) : (
+          <Menu
+            visible={menuVisible}
+            onDismiss={closeMenu}
+            anchor={
+              <View collapsable={false}>
+                <TouchableOpacity
+                  onPress={openMenu}
+                  style={styles.menuIcon}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="menu-outline" size={28} color="#4B5563" />
+                </TouchableOpacity>
+              </View>
+            }
+            contentStyle={styles.menuContent}
+          >
+            {renderMenuItems()}
+          </Menu>
+        )
+      }
 
       {/* Center: Title or Search */}
       <View style={styles.centerContent}>

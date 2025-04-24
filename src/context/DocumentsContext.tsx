@@ -10,7 +10,7 @@ const DocumentsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [documents, setDocuments] = useState({})
+  const [documents, setDocuments] = useState<Document[]>([]);
   // const [query, setQuery] = useState("") 
   const [department, setDepartment] = useState("")
   const [startDate, setStartDate] = useState("")
@@ -57,7 +57,7 @@ const DocumentsProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     getDocuments();
-  }, [status, department, startDate, endDate, startDate, createdBy])
+  }, [status, department, startDate, endDate, createdBy])
 
 
 
