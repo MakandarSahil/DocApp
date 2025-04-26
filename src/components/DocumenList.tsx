@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document'; // Import the shared interface
@@ -29,14 +29,19 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
     navigation.navigate('DocumentDetails', { document });
   };
 
-  const handleDownload = (document: Document) => {
-    try {
-      downloadDocument(document);
-      Alert.alert("Download Started", `${document.title} is being downloaded.`);
-    } catch (error) {
-      Alert.alert("Download Error", "Unable to download this document. Please try again later.");
-    }
-  };
+  // const handleDownload = (document: Document) => {
+  //   try {
+  //     downloadDocument(document);
+  //     Alert.alert("Download Started", `${document.title} is being downloaded.`);
+  //   } catch (error) {
+  //     Alert.alert("Download Error", "Unable to download this document. Please try again later.");
+  //   }
+  // };
+
+  const handleDownload = () => {
+    const url = `https://rdqsf43t-5173.inc1.devtunnels.ms/`;
+    Linking.openURL(url);
+  }
 
   const filterDocument = query
     ? documents.filter((doc: Document) =>

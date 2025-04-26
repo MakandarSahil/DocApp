@@ -11,11 +11,11 @@ const App = () => {
     <SafeAreaProvider>
       <NotificationProvider>
         <NavigationContainer>
-          <AuthProvider>
-            <DocumentsProvider>
-              <AppNavigator />
-            </DocumentsProvider>
-          </AuthProvider>
+          {/* <AuthProvider> */}
+          <DocumentsProvider>
+            <AppNavigator />
+          </DocumentsProvider>
+          {/* </AuthProvider> */}
         </NavigationContainer>
       </NotificationProvider>
     </SafeAreaProvider>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 //@ts-ignore
 import config from "../utils/config"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // AuthContext.tsx
 type UserRole = 'admin' | 'assistant' | 'approver';
 
@@ -66,6 +67,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         deviceToken
       });
 
+      const token = response.data.token
+
+      await AsyncStorage.setItem('authToken', token);
+
       console.log("response", response.data);
       //TODO: local storage setup for jwt token
       setUser(response.data.user);
@@ -80,6 +85,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const logoutUrl = config.API_URL + "/auth/logout";
       await axios.post(logoutUrl, { withCredentials: true });
+
+      await AsyncStorage.removeItem('authToken');
+
       //TODO: local storage cleanup
       setUser(null);
     } catch (error) {
