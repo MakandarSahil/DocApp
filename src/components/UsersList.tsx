@@ -29,47 +29,34 @@ const UsersList: React.FC<Props> = ({ query }) => {
 
   const userRole = useAuth()?.user?.role;
 
-  // useEffect(() => {
-  //   const loadUsers = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       // Dummy delay + users
-  //       setTimeout(() => {
-  //         setUsers([
-  //           { id: '1', name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
-  //           { id: '2', name: 'Bob Smith', email: 'bob@example.com', role: 'Editor' },
-  //           { id: '3', name: 'Charlie Lee', email: 'charlie@example.com', role: 'Viewer' },
-  //         ]);
-  //         setIsLoading(false);
-  //       }, 1000);
-  //     } catch (e) {
-  //       setError('Failed to fetch users.');
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   loadUsers();
-  // }, []);
-
   useEffect(() => {
+    if (!userRole) return;
     const getAllUsers = async () => {
       try {
-        console.log('fetching users')
+        console.log('fetching users');
         setIsLoading(true);
-        const getUserUrl = config.API_URL + `/${userRole}/get-all-users`;
-        console.log(getUserUrl)
+        const getUserUrl = config.API_URL + '/user/get-users';
+        console.log('API URL:', getUserUrl);
         const response = await axios.get(getUserUrl);
+        console.log('Fetched users:', response.data);
 
-        console.log(response)
-        setUsers(response.data.users);
+        const mappedUsers = response.data.users.map((user: any) => ({
+          id: user._id,
+          name: user.fullName,
+          email: user.email,
+          role: user.role,
+        }));
+
+        setUsers(mappedUsers);
         setIsLoading(false);
-      } catch (err) {
+      } catch (err: any) {
+        console.log('error : ', err);
         setError('Failed to fetch users.');
         setIsLoading(false);
       }
-    }
+    };
     getAllUsers();
-  }, [])
+  }, [userRole]);
 
   const filteredUsers = query
     ? users.filter(user =>
@@ -100,7 +87,7 @@ const UsersList: React.FC<Props> = ({ query }) => {
       <Text style={styles.sectionTitle}>All Users ({filteredUsers.length})</Text>
       <FlatList
         data={filteredUsers}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
         renderItem={({ item }) => (
           <View style={styles.userCard}>
             <View style={styles.avatar}>

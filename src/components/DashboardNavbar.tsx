@@ -27,7 +27,6 @@ interface Props {
   onToggleSearch?: () => void;
   onNavigateToProfile?: () => void;
   // onViewAllDocs?: () => void;
-  onManageUsers?: () => void;
   // onViewAllUsers?: () => void;
   onViewHistory?: () => void;
   onLogout?: () => void;
@@ -44,7 +43,6 @@ const DashboardNavbar = memo(({
   onToggleSearch,
   onNavigateToProfile,
   // onViewAllDocs,
-  onManageUsers,
   onLogout,
   // onViewAllUsers,
   onViewHistory,
@@ -82,6 +80,11 @@ const DashboardNavbar = memo(({
     closeMenu();
   }
 
+  const handleManageUsers = () => {
+    navigation.navigate('AllUsers');
+    closeMenu();
+  }
+
   const handleMenuItemPress = useCallback((callback?: () => void) => {
     return () => {
       closeMenu();
@@ -107,7 +110,7 @@ const DashboardNavbar = memo(({
       items.push(
         <Menu.Item
           key="manage-users"
-          onPress={handleMenuItemPress(onManageUsers)}
+          onPress={() => handleManageUsers()}
           title="Manage Users"
           titleStyle={styles.menuItemText}
           leadingIcon={() => <Ionicons name="people-outline" size={20} color="#4B5563" />}
@@ -158,7 +161,7 @@ const DashboardNavbar = memo(({
     );
 
     return items;
-  }, [userRole, handleMenuItemPress, onNavigateToProfile, onManageUsers, onViewHistory, onLogout]);
+  }, [userRole, handleMenuItemPress, onNavigateToProfile, onViewHistory, onLogout]);
 
   return (
     <SafeAreaView style={[

@@ -46,7 +46,6 @@ const DashboardLayout = ({
   const userRole: 'admin' | 'approver' | 'assistant' | undefined = user?.role;
 
   const navHandlers = useMemo(() => ({
-    onManageUsers: () => userRole === 'admin' && console.log('Manage Users'),
     onViewHistory: () => userRole === 'approver' && console.log('View History'),
     onLogout: () => logout(),
   }), [userRole, logout]);
