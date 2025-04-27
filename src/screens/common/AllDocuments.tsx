@@ -18,7 +18,7 @@ const AllDocuments = () => {
     React.useCallback(() => {
       setStatus('pending-rejected-correction-approved');
       return () => setStatus(status); // Ensure we reset status only when it's changed
-    }, [setStatus, status])
+    }, [setStatus])
   );
   const toggleSearch = () => {
     if (searchActive && query) {
