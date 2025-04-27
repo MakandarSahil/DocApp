@@ -1,15 +1,14 @@
-import axios from 'axios';
+// UsersList.tsx
 import React, { useEffect, useState } from 'react';
-import {
-  FlatList,
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import config from '../utils/config';
 import { useAuth } from '../context/AuthContext';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigationTypes';
+import { useNavigation } from '@react-navigation/native';
+import UserItem from './UserItem'; // Import UserItem component
+import config from '../utils/config';
 
 interface User {
   id: string;
@@ -27,18 +26,19 @@ const UsersList: React.FC<Props> = ({ query }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  const userRole = useAuth()?.user?.role;
+  const { user } = useAuth();
+  const userRole = user?.role;
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     if (!userRole) return;
+
     const getAllUsers = async () => {
       try {
-        console.log('fetching users');
         setIsLoading(true);
         const getUserUrl = config.API_URL + '/user/get-users';
-        console.log('API URL:', getUserUrl);
         const response = await axios.get(getUserUrl);
-        console.log('Fetched users:', response.data);
 
         const mappedUsers = response.data.users.map((user: any) => ({
           id: user._id,
@@ -50,11 +50,12 @@ const UsersList: React.FC<Props> = ({ query }) => {
         setUsers(mappedUsers);
         setIsLoading(false);
       } catch (err: any) {
-        console.log('error : ', err);
+        console.error('Error fetching users: ', err);
         setError('Failed to fetch users.');
         setIsLoading(false);
       }
     };
+
     getAllUsers();
   }, [userRole]);
 
@@ -63,6 +64,12 @@ const UsersList: React.FC<Props> = ({ query }) => {
       user.name.toLowerCase().includes(query.toLowerCase())
     )
     : users;
+
+  console.log(filteredUsers)
+
+  // const handleProfilePress = (userId: string) => {
+  //   navigation.navigate('Profile', { userId });
+  // };
 
   if (isLoading) {
     return (
@@ -87,38 +94,16 @@ const UsersList: React.FC<Props> = ({ query }) => {
       <Text style={styles.sectionTitle}>All Users ({filteredUsers.length})</Text>
       <FlatList
         data={filteredUsers}
-        keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.userCard}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{item.name[0]}</Text>
-            </View>
-            <View style={styles.userInfo}>
-              <Text style={styles.name}>{item.name}</Text>
-              <View style={styles.detailRow}>
-                <Icon name="email-outline" size={16} color="#6B7280" />
-                <Text style={styles.email}>{item.email}</Text>
-              </View>
-              {item.role && (
-                <View style={styles.detailRow}>
-                  <Icon name="shield-account-outline" size={16} color="#6B7280" />
-                  <Text style={styles.role}>{item.role}</Text>
-                </View>
-              )}
-            </View>
-          </View>
+          <UserItem user={item} />
         )}
-        contentContainerStyle={[
-          styles.listContent,
-          filteredUsers.length === 0 && styles.centerContent,
-        ]}
+        contentContainerStyle={[styles.listContent, filteredUsers.length === 0 && styles.centerContent]}
         ListEmptyComponent={
           <View style={styles.centerContent}>
             <Icon name="account-outline" size={48} color="#D1D5DB" />
             <Text style={styles.emptyText}>No users found.</Text>
-            {query ? (
-              <Text style={styles.emptySubText}>Check your search keyword</Text>
-            ) : null}
+            {query ? <Text style={styles.emptySubText}>Check your search keyword</Text> : null}
           </View>
         }
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
@@ -167,54 +152,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: '#9CA3AF',
-  },
-  userCard: {
-    flexDirection: 'row',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#3B82F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  userInfo: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  email: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  role: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#4B5563',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
   },
 });
 

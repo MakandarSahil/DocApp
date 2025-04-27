@@ -1,7 +1,7 @@
 // navigationTypes.ts
 export type RootStackParamList = {
   Login: undefined;
-  Profile: undefined;
+  Profile: { userId: string };
   DocumentDetails: { document: Document };
   AllDocuments: undefined;
   AllUsers: undefined;

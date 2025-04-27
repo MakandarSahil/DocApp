@@ -73,13 +73,13 @@ const ProfileScreen = () => {
             <View style={styles.actionIconContainer}>
               <Ionicons name="call-outline" size={20} color="#0ea5e9" />
             </View>
-            <Text style={styles.actionLabel}>Call</Text>
+            <Text style={styles.actionLabel}>Call Admin</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBox} onPress={handleWhatsApp}>
             <View style={[styles.actionIconContainer, { backgroundColor: '#d1fae5' }]}>
               <Ionicons name="logo-whatsapp" size={20} color="#10b981" />
             </View>
-            <Text style={styles.actionLabel}>WhatsApp</Text>
+            <Text style={styles.actionLabel}>WhatsApp Admin</Text>
           </TouchableOpacity>
         </View>
 
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: {
     marginTop: 6,
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '500',
     color: '#374151',
   },

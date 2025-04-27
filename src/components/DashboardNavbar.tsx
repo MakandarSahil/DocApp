@@ -139,15 +139,15 @@ const DashboardNavbar = memo(({
         />
       );
 
-      items.push(
-        <Menu.Item
-          key="history"
-          onPress={handleMenuItemPress(onViewHistory)}
-          title="History"
-          titleStyle={styles.menuItemText}
-          leadingIcon={() => <Ionicons name="time-outline" size={20} color="#4B5563" />}
-        />
-      );
+      // items.push(
+      //   <Menu.Item
+      //     key="history"
+      //     onPress={handleMenuItemPress(onViewHistory)}
+      //     title="History"
+      //     titleStyle={styles.menuItemText}
+      //     leadingIcon={() => <Ionicons name="time-outline" size={20} color="#4B5563" />}
+      //   />
+      // );
     }
 
     items.push(
