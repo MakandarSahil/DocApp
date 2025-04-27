@@ -71,7 +71,7 @@ const DashboardNavbar = memo(({
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleViewAllDocs = () => {
-    navigation.navigate('AllDocuments');
+    navigation.navigate('AllDocuments' as any);
     closeMenu();
   }
 
