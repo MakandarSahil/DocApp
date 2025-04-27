@@ -1,5 +1,5 @@
 const config = {
-  API_URL: 'http://13.235.185.189:4000',
+  API_URL: 'http://13.201.156.158:4000',
   FIREBASE_API_KEY: 'AIzaSyCPb2Z24Ef2gg5f0lMPAXyZoFpe_lruo6A',
   FIREBASE_AUTH_DOMAIN: 'document-approval-system.firebaseapp.com',
   FIREBASE_PROJECT_ID: 'document-approval-system',

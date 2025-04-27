@@ -39,25 +39,6 @@ const RejectedScreen: React.FC<Props> = ({ query }) => {
 
   return (
     <View style={styles.container}>
-      {/* <Text>hii from pending screen</Text> */}
-      {/* {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading documents...</Text>
-        </View>
-      ) : (
-        // <DocumentList
-        //   documents={documents}
-        //   status={status}
-        //   onPreview={handlePreview}
-        //   onDownload={handleDownload}
-        //   isLoading={loading}
-        //   query={query}
-        // />
-        <DocumentList
-          query={query}
-        />
-      )} */}
       <DocumentList query={query} />
     </View>
   );
