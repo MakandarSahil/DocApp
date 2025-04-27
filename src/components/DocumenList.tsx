@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
-import { Document } from '../types/document'; // Import the shared interface
+import { Document } from '../types/document';
 import { useAuth } from '../context/AuthContext';
 import { useDocuments } from '../context/DocumentsContext';
 import { useNavigation } from '@react-navigation/native';
@@ -16,11 +16,17 @@ interface Props {
 }
 
 const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
-
+  // All hooks must be called unconditionally at the top
   const { documents, isLoading, status, refreshDocuments } = useDocuments();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
   const [refreshing, setRefreshing] = useState(false);
+  const userRole = useAuth()?.user?.role;
+
+  // All useCallbacks must also be at the top
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refreshDocuments().finally(() => setRefreshing(false));
+  }, [refreshDocuments]);
 
   const handlePreview = (document: Document) => {
     navigation.navigate('DocumentDetails', { document });
@@ -41,7 +47,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
     )
     : documents;
 
-  // Loading state
+  // Loading state - must come after all hooks
   if (isLoading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
@@ -50,15 +56,6 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
       </View>
     );
   }
-
-  const userRole = useAuth()?.user?.role;
-
-  // Pull-to-refresh handler
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refreshDocuments()
-      .finally(() => setRefreshing(false)); // Stop refreshing after refetching
-  }, [refreshDocuments]);
 
   return (
     <View style={styles.container}>
@@ -100,8 +97,8 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh} // Trigger onRefresh function
-            tintColor="#3B82F6" // Color of the spinner
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
           />
         }
       />

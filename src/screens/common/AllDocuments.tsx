@@ -17,10 +17,8 @@ const AllDocuments = () => {
   useFocusEffect(
     React.useCallback(() => {
       setStatus('pending-rejected-correction-approved');
-      return () => {
-        setStatus(status)
-      };
-    }, [setStatus])
+      return () => setStatus(status); // Ensure we reset status only when it's changed
+    }, [setStatus, status])
   );
   const toggleSearch = () => {
     if (searchActive && query) {
