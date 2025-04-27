@@ -1,6 +1,7 @@
 export interface Document {
   id: string;
   title: string;
+  fileUniqueName: string;
   status: 'pending' | 'approved' | 'rejected' | 'correction';
   createdDate: string;
   createdBy: {

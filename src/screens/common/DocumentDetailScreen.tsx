@@ -20,6 +20,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 // import Pdf from 'react-native-pdf';
 import { Document } from '../../types/document';
+import axios from 'axios';
+import config from '../../utils/config';
 
 interface Props {
   route: { params: { document: Document } };
@@ -89,8 +91,46 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const pdfSource = { uri: document.fileUrl || 'https://example.com/sample.pdf' };
 
-  const handleAction = useCallback((action: 'approve' | 'reject' | 'correction') => {
-    if (action !== 'approve' && remarks.trim() === '') {
+  // const handleAction = useCallback((action: 'approve' | 'reject' | 'correction') => {
+  //   if (action !== 'approve' && remarks.trim() === '') {
+  //     Keyboard.dismiss();
+  //     Alert.alert(
+  //       "Remarks Required",
+  //       "Please provide remarks for rejection or correction request.",
+  //       [{
+  //         text: "OK",
+  //         onPress: () => {
+  //           remarksInputRef.current?.focus();
+  //           setTimeout(() => {
+  //             scrollViewRef.current?.scrollToEnd({ animated: true });
+  //           }, 100);
+  //         }
+  //       }]
+  //     );
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   Keyboard.dismiss();
+
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //     const actionText = action === 'approve' ? 'approved' :
+  //       action === 'reject' ? 'rejected' :
+  //         'sent for correction';
+
+  //     Alert.alert(
+  //       "Success",
+  //       `Document ${actionText} successfully.`,
+  //       [{ text: "OK", onPress: () => navigation.goBack() }]
+  //     );
+  //   }, 1000);
+  // }, [remarks, navigation]);
+
+
+  const handleAction = useCallback(async (action: 'approve' | 'reject' | 'correction') => {
+    if ((action === 'reject' || action === 'correction') && remarks.trim() === '') {
       Keyboard.dismiss();
       Alert.alert(
         "Remarks Required",
@@ -111,20 +151,43 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     setLoading(true);
     Keyboard.dismiss();
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      const actionText = action === 'approve' ? 'approved' :
-        action === 'reject' ? 'rejected' :
-          'sent for correction';
+    try {
+      let url = '';
+      if (action === 'approve') {
+        url = config.API_URL + '/file/approve';
+      } else if (action === 'reject') {
+        url = config.API_URL + '/file/reject';
+      } else if (action === 'correction') {
+        url = config.API_URL + '/file/correction';
+      }
+
+      const payload: any = {
+        fileUniqueName: document.fileUniqueName,
+      };
+
+      if (action !== 'approve') {
+        payload.remarks = remarks.trim();
+      }
+
+      const response = await axios.post(url, payload, {
+        withCredentials: true,
+      });
 
       Alert.alert(
         "Success",
-        `Document ${actionText} successfully.`,
+        response.data.message || "Action completed successfully!",
         [{ text: "OK", onPress: () => navigation.goBack() }]
       );
-    }, 1000);
-  }, [remarks, navigation]);
+    } catch (error: any) {
+      console.error('Action error:', error.response?.data?.message || error.message);
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Failed to perform action."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [remarks, navigation, document.fileUniqueName]);
 
   const statusStyles = {
     approved: { backgroundColor: '#D1FAE5', textColor: '#065F46' },
