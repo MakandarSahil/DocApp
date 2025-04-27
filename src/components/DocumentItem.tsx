@@ -16,6 +16,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({ document, onPreview, onDown
         <Icon name="file-document-outline" size={28} color="#4B5563" style={styles.fileIcon} />
         <View style={styles.textContainer}>
           <Text style={styles.documentName}>{document.title}</Text>
+          <Text style={styles.statusText}>Department : {document.department.departmentName}</Text>
           <View style={styles.metaInfo}>
             <Text style={styles.metaText}>From: {document.createdBy.fullName}</Text>
             <Text style={styles.metaText}>{new Date(document.createdDate).toLocaleDateString()}</Text>
@@ -72,12 +73,13 @@ const styles = StyleSheet.create({
   },
   fileIcon: {
     marginRight: 12,
+    marginBottom: 22,
   },
   textContainer: {
     flex: 1,
   },
   documentName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
     color: '#1F2937',
     marginBottom: 4,

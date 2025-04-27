@@ -25,5 +25,9 @@ export interface Document {
   };
   remarks?: string; // Optional remarks for rejection or correction
   role: 'admin' | 'approver' | 'assistant';
+  department: {
+    departmentId: string;
+    departmentName: string;
+  };
   fileUrl?: string; // Optional file preview/download link
 }

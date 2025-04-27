@@ -18,7 +18,6 @@ import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
-import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 // Types
 interface LoginFormValues {
@@ -39,15 +38,21 @@ const LoginScreen: React.FC = () => {
   const { fcmToken } = useNotification();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const passwordInputRef = useRef<TextInput>(null);
+  const [error, setError] = useState<string | null>(null); // For error message
+  const [success, setSuccess] = useState<string | null>(null); // For success message
 
   const handleLogin = async (
     values: LoginFormValues,
     { setSubmitting }: FormikHelpers<LoginFormValues>
   ) => {
+    setError(null); // Reset previous error
+    setSuccess(null); // Reset previous success message
     try {
       await login(values.username, values.password, fcmToken);
-    } catch (error) {
-      console.error('Login error:', error);
+      setSuccess('Login successful!'); // Show success message
+    } catch (err) {
+      setError('Login failed. Please check your credentials and try again.'); // Show error message
+      console.error('Login error:', err);
     } finally {
       setSubmitting(false);
     }
@@ -87,6 +92,14 @@ const LoginScreen: React.FC = () => {
             {/* Titles */}
             <Text style={styles.title}>Welcome to DocApp</Text>
             <Text style={styles.subtitle}>Login to access your dashboard</Text>
+
+            {/* Error or Success Message */}
+            {error && (
+              <Text style={styles.errorText}>{error}</Text>
+            )}
+            {success && (
+              <Text style={styles.successText}>{success}</Text>
+            )}
 
             {/* Formik Form */}
             <Formik
@@ -289,6 +302,12 @@ const styles = StyleSheet.create({
     color: '#dc3545',
     marginTop: 4,
     marginLeft: 4,
+  },
+  successText: {
+    fontSize: 14,
+    color: '#28a745',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   loginButton: {
     height: 50,

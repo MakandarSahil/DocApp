@@ -44,6 +44,7 @@ const DocumentsProvider = ({ children }: { children: ReactNode }) => {
       const getDocUrl = `${config.API_URL}/file/get-documents?${queryParams}`;
       const response = await axios.get(getDocUrl, { withCredentials: true });
       setDocuments(response.data.documents);
+      console.log(response.data.documents);
     } catch (err: any) {
       console.error("Error while fetching documents:", err?.message);
       setError("Error while fetching documents. Please try again later.");
