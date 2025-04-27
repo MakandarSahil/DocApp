@@ -1,9 +1,11 @@
 // navigationTypes.ts
+import { User } from "../context/DocumentsContext";
+
 export type RootStackParamList = {
   Login: undefined;
   Profile: { userId: string };
   DocumentDetails: { document: Document };
-  AllDocuments: undefined;
+  AllDocuments: { createdBy?: User };
   AllUsers: undefined;
   // Add all your other screens here
 };

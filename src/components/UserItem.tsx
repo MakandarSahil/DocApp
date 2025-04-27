@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes';
+import { User } from '../context/DocumentsContext'; // Make sure to import your User type
 
 interface UserItemProps {
-  user: {
+  user: User & { // Extend with any additional user properties you need
     id: string;
     name: string;
     email: string;
@@ -22,12 +23,21 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
   };
 
   const handleCallPress = () => {
-    // Linking.openURL(`tel:${user.mobileNo}`);
-    console.log("send mobile no from backend")
+    console.log("send mobile no from backend");
   };
 
   const handleDocumentPress = () => {
-    console.log(`Viewing documents for ${user.name}`);
+    // Navigate to AllDocuments screen with the user as createdBy filter
+    // navigation.navigate('AllDocuments', {
+    //   createdBy: {
+    //     _id: user.id,
+    //     fullName: user.name,
+    //     email: user.email,
+    //     role: user.role || '',
+    //     username: user.email.split('@')[0] // Or get username from your user object
+    //   }
+    // });
+    console.log(`Viewing documents for ${user.fullName}`);
   };
 
   return (

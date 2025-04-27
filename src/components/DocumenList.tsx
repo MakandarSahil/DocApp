@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document';
 import { useAuth } from '../context/AuthContext';
-import { useDocuments } from '../context/DocumentsContext';
+import { useDocuments, User } from '../context/DocumentsContext'; // Import User from the same file
 import { useNavigation } from '@react-navigation/native';
 import { downloadDocument } from '../utils/documentHandlers';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,16 +13,29 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 interface Props {
   query?: string;
   isAllDocsScreen?: boolean;
+  createdBy?: User | null; // New prop to filter by creator
 }
 
-const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
-  // All hooks must be called unconditionally at the top
-  const { documents, isLoading, status, refreshDocuments } = useDocuments();
+const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, createdBy }) => {
+  const {
+    documents,
+    isLoading,
+    status,
+    refreshDocuments,
+    setCreatedBy
+  } = useDocuments();
+
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [refreshing, setRefreshing] = useState(false);
   const userRole = useAuth()?.user?.role;
 
-  // All useCallbacks must also be at the top
+  // Set the createdBy filter when the prop changes
+  useEffect(() => {
+    if (createdBy !== undefined) {
+      setCreatedBy(createdBy);
+    }
+  }, [createdBy, setCreatedBy]);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     refreshDocuments().finally(() => setRefreshing(false));
@@ -47,7 +60,6 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
     )
     : documents;
 
-  // Loading state - must come after all hooks
   if (isLoading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
@@ -83,13 +95,15 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
           <View style={styles.emptyContainer}>
             <Icon name="file-document-outline" size={48} color="#D1D5DB" />
             <Text style={styles.emptyText}>
-              No {status?.toLowerCase() ?? 'documents'} found for {userRole}.
+              {createdBy
+                ? `No documents found created by ${createdBy.fullName}`
+                : `No ${status?.toLowerCase() ?? 'documents'} found for ${userRole}.`}
             </Text>
-            {query ? (
+            {query && (
               <Text style={styles.emptySubText}>
                 Check Search Spelling
               </Text>
-            ) : null}
+            )}
           </View>
         }
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
