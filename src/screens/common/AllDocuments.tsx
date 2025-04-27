@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import DashboardNavbar from '../../components/DashboardNavbar';
 import { useAuth } from '../../context/AuthContext';
 import DocumentList from '../../components/DocumenList';
@@ -14,10 +14,14 @@ const AllDocuments = () => {
 
   const { setStatus, status } = useDocuments()
 
-  useEffect(() => {
-    setStatus('pending-rejected-correction-approved')
-  }, [status])
-
+  useFocusEffect(
+    React.useCallback(() => {
+      setStatus('pending-rejected-correction-approved');
+      return () => {
+        setStatus(status)
+      };
+    }, [setStatus])
+  );
   const toggleSearch = () => {
     if (searchActive && query) {
       setQuery('');

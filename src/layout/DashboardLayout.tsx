@@ -1,17 +1,14 @@
 import React, { ReactNode, useState, useMemo } from 'react';
 import {
   View,
-  ScrollView,
   StyleSheet,
   StatusBar,
   Platform,
   RefreshControl,
   KeyboardAvoidingView,
   ActivityIndicator,
-  Text,
 } from 'react-native';
 import DashboardNavbar from '../components/DashboardNavbar';
-import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -45,7 +42,6 @@ const DashboardLayout = ({
   const { user, logout } = useAuth();
   const [searchActive, setSearchActive] = useState(false);
   const [query, setQuery] = useState('');
-
 
   const userRole: 'admin' | 'approver' | 'assistant' | undefined = user?.role;
 
@@ -85,7 +81,6 @@ const DashboardLayout = ({
           onNavigateToProfile={onNavigateToProfile}
           {...navHandlers}
         />
-        {/* <Text>hii from dashboard layout</Text> */}
 
         <KeyboardAvoidingView
           style={styles.keyboardView}
@@ -97,7 +92,7 @@ const DashboardLayout = ({
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
           ) : (
-            <View style={[styles.scrollContent, contentContainerStyle]}>
+            <View style={styles.scrollContent}>
               {children({ query })}
             </View>
           )}

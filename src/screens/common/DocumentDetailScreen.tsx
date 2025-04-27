@@ -16,12 +16,13 @@ import {
   Animated,
   Dimensions
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
-// import Pdf from 'react-native-pdf';
-import { Document } from '../../types/document';
 import axios from 'axios';
 import config from '../../utils/config';
+import { Document } from '../../types/document';
+import { useDocuments } from '../../context/DocumentsContext';
 
 interface Props {
   route: { params: { document: Document } };
@@ -32,41 +33,57 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { document } = route.params;
   const [remarks, setRemarks] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [pdfLoading, setPdfLoading] = useState<boolean>(true);
   const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+
+  const { refreshDocuments } = useDocuments();
+
+  // Get safe area insets
+  const insets = useSafeAreaInsets();
 
   const scrollViewRef = useRef<ScrollView>(null);
   const remarksInputRef = useRef<TextInput>(null);
-
-  // Animation values
   const pdfHeight = useRef(new Animated.Value(400)).current;
-  const screenHeight = Dimensions.get('window').height;
+  const { height: screenHeight } = Dimensions.get('window');
 
-  // Handle keyboard appearance
+  // Status styles configuration
+  const statusStyles = {
+    approved: { backgroundColor: '#D1FAE5', textColor: '#065F46' },
+    pending: { backgroundColor: '#FEF3C7', textColor: '#92400E' },
+    rejected: { backgroundColor: '#FEE2E2', textColor: '#991B1B' },
+    correction: { backgroundColor: '#F59E0B', textColor: '#991B1B' }
+  };
+
+  const currentStatus = document.status.toLowerCase() as keyof typeof statusStyles;
+
+  // Keyboard handlers
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      (event) => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        const keyboardHeight = e.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
         setKeyboardVisible(true);
-        // Animate PDF container to smaller height when keyboard appears
+
         Animated.timing(pdfHeight, {
           toValue: 200,
           duration: 300,
           useNativeDriver: false,
         }).start();
 
-        // Scroll to remarks input
+        // Scroll to remarks input with a delay to ensure layout is complete
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
       }
     );
 
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
         setKeyboardVisible(false);
-        // Animate PDF container back to original height
+        setKeyboardHeight(0);
+
         Animated.timing(pdfHeight, {
           toValue: 400,
           duration: 300,
@@ -76,12 +93,12 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     );
 
     return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
     };
   }, []);
 
-  // Handle status bar appearance
+  // Status bar appearance
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle('dark-content');
@@ -89,45 +106,16 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }, [])
   );
 
-  const pdfSource = { uri: document.fileUrl || 'https://example.com/sample.pdf' };
+  const scrollToRemarks = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
-  // const handleAction = useCallback((action: 'approve' | 'reject' | 'correction') => {
-  //   if (action !== 'approve' && remarks.trim() === '') {
-  //     Keyboard.dismiss();
-  //     Alert.alert(
-  //       "Remarks Required",
-  //       "Please provide remarks for rejection or correction request.",
-  //       [{
-  //         text: "OK",
-  //         onPress: () => {
-  //           remarksInputRef.current?.focus();
-  //           setTimeout(() => {
-  //             scrollViewRef.current?.scrollToEnd({ animated: true });
-  //           }, 100);
-  //         }
-  //       }]
-  //     );
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   Keyboard.dismiss();
-
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     setLoading(false);
-  //     const actionText = action === 'approve' ? 'approved' :
-  //       action === 'reject' ? 'rejected' :
-  //         'sent for correction';
-
-  //     Alert.alert(
-  //       "Success",
-  //       `Document ${actionText} successfully.`,
-  //       [{ text: "OK", onPress: () => navigation.goBack() }]
-  //     );
-  //   }, 1000);
-  // }, [remarks, navigation]);
-
+  const focusRemarksInput = () => {
+    remarksInputRef.current?.focus();
+    scrollToRemarks();
+  };
 
   const handleAction = useCallback(async (action: 'approve' | 'reject' | 'correction') => {
     if ((action === 'reject' || action === 'correction') && remarks.trim() === '') {
@@ -138,10 +126,7 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         [{
           text: "OK",
           onPress: () => {
-            remarksInputRef.current?.focus();
-            setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
+            focusRemarksInput();
           }
         }]
       );
@@ -152,14 +137,11 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     Keyboard.dismiss();
 
     try {
-      let url = '';
-      if (action === 'approve') {
-        url = config.API_URL + '/file/approve';
-      } else if (action === 'reject') {
-        url = config.API_URL + '/file/reject';
-      } else if (action === 'correction') {
-        url = config.API_URL + '/file/correction';
-      }
+      const endpoints = {
+        approve: '/file/approve',
+        reject: '/file/reject',
+        correction: '/file/correction'
+      };
 
       const payload: any = {
         fileUniqueName: document.fileUniqueName,
@@ -169,9 +151,13 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         payload.remarks = remarks.trim();
       }
 
-      const response = await axios.post(url, payload, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        config.API_URL + endpoints[action],
+        payload,
+        { withCredentials: true }
+      );
+
+      await refreshDocuments();
 
       Alert.alert(
         "Success",
@@ -189,218 +175,272 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [remarks, navigation, document.fileUniqueName]);
 
-  const statusStyles = {
-    approved: { backgroundColor: '#D1FAE5', textColor: '#065F46' },
-    pending: { backgroundColor: '#FEF3C7', textColor: '#92400E' },
-    rejected: { backgroundColor: '#FEE2E2', textColor: '#991B1B' }
+  const getActionText = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'approved': return 'Document Approved';
+      case 'rejected': return 'Document Rejected';
+      case 'correction': return 'Sent for Correction';
+      default: return '';
+    }
   };
 
-  const currentStatus = document.status.toLowerCase() as keyof typeof statusStyles;
+  const renderHeader = () => (
+    <View style={[
+      styles.header,
+      // Apply top padding based on safe area insets
+      { paddingTop: Math.max(insets.top, 12) }
+    ]}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => {
+          Keyboard.dismiss();
+          navigation.goBack();
+        }}
+        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+      >
+        <Icon name="arrow-left" size={24} color="#4B5563" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
+        Document Details
+      </Text>
+      <TouchableOpacity
+        style={styles.headerRightButton}
+        onPress={() => {
+          Alert.alert(
+            "Document Information",
+            `Name: ${document.title}\nStatus: ${document.status}\nDate: ${new Date(document.createdDate).toLocaleDateString()}\nRole: ${document.createdBy.fullName}`,
+            [{ text: "OK" }]
+          );
+        }}
+      >
+        <Icon name="information-outline" size={24} color="#4B5563" />
+      </TouchableOpacity>
+    </View>
+  );
 
-  const focusRemarksInput = () => {
-    remarksInputRef.current?.focus();
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+  const renderDocumentInfo = () => (
+    <View style={styles.infoCard}>
+      <Icon name="file-document-outline" size={24} color="#4B5563" style={styles.infoIcon} />
+      <View style={styles.infoContent}>
+        <Text style={styles.documentName} numberOfLines={2} ellipsizeMode="tail">
+          {document.title}
+        </Text>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Status:</Text>
+          <View style={[
+            styles.statusBadge,
+            { backgroundColor: statusStyles[currentStatus].backgroundColor }
+          ]}>
+            <Text style={[
+              styles.statusText,
+              { color: statusStyles[currentStatus].textColor }
+            ]}>
+              {document.status}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Date:</Text>
+          <Text style={styles.metaValue}>
+            {new Date(document.createdDate).toLocaleDateString()}
+          </Text>
+        </View>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>From:</Text>
+          <Text style={styles.metaValue}>
+            {document.createdBy.fullName}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderRemarksInfo = () => {
+    if (document.status === 'pending') return null;
+
+    const getStatusDate = () => {
+      if (currentStatus === 'approved' && document.approvedDate) {
+        return new Date(document.approvedDate).toLocaleDateString();
+      }
+      if (currentStatus === 'rejected' && document.rejectedDate) {
+        return new Date(document.rejectedDate).toLocaleDateString();
+      }
+      if (currentStatus === 'correction' && document.correctionDate) {
+        return new Date(document.correctionDate).toLocaleDateString();
+      }
+      return null;
+    };
+
+    return (
+      <View style={styles.remarkInfoContainer}>
+        <View style={styles.remarkActionRow}>
+          {currentStatus === 'approved' && (
+            <Icon name="check-circle-outline" size={20} color="#10B981" style={styles.remarkIcon} />
+          )}
+          {currentStatus === 'rejected' && (
+            <Icon name="close-circle-outline" size={20} color="#EF4444" style={styles.remarkIcon} />
+          )}
+          {currentStatus === 'correction' && (
+            <Icon name="pencil-outline" size={20} color="#F59E0B" style={styles.remarkIcon} />
+          )}
+          <Text style={styles.remarkActionText}>
+            {getActionText(currentStatus)}
+          </Text>
+        </View>
+
+        <Text style={styles.remarkLabel}>Date:</Text>
+        <Text style={styles.remarkValue}>
+          {getStatusDate() || 'N/A'}
+        </Text>
+
+        <Text style={styles.remarkLabel}>Remarks:</Text>
+        <Text style={styles.remarkValue}>
+          {document.remarks || "No remarks provided."}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderPDFPreview = () => (
+    <Animated.View style={[styles.pdfContainer, { height: pdfHeight }]}>
+      <View style={styles.sectionTitleRow}>
+        <Text style={styles.sectionTitle}>Document Preview</Text>
+        {isKeyboardVisible && (
+          <TouchableOpacity
+            style={styles.expandButton}
+            onPress={() => Keyboard.dismiss()}
+          >
+            <Text style={styles.expandButtonText}>Expand</Text>
+            <Icon name="arrow-expand" size={16} color="#3B82F6" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.pdfWrapper}>
+        <View style={styles.pdfPlaceholder}>
+          <Icon name="file-pdf-box" size={48} color="#E5E7EB" />
+          <Text style={styles.pdfText}>
+            PDF preview will be displayed here
+          </Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+
+  const renderRemarksInput = () => {
+    if (currentStatus !== 'pending') return null;
+
+    return (
+      <View style={styles.remarksContainer}>
+        <View style={styles.sectionTitleRow}>
+          <Text style={styles.sectionTitle}>Remarks</Text>
+          <TouchableOpacity
+            style={styles.addRemarksButton}
+            onPress={focusRemarksInput}
+          >
+            <Text style={styles.addRemarksText}>Add remarks</Text>
+            <Icon name="pencil" size={16} color="#3B82F6" />
+          </TouchableOpacity>
+        </View>
+        <TextInput
+          ref={remarksInputRef}
+          style={[
+            styles.remarksInput,
+            isKeyboardVisible && styles.remarksInputFocused
+          ]}
+          multiline
+          placeholder="Add your remarks here..."
+          placeholderTextColor="#9CA3AF"
+          value={remarks}
+          onChangeText={setRemarks}
+          textAlignVertical="top"
+          returnKeyType="default"
+        />
+      </View>
+    );
+  };
+
+  const renderActionButtons = () => {
+    if (currentStatus !== 'pending') return null;
+
+    return (
+      <View style={[
+        styles.actionContainer,
+        // Apply bottom padding based on safe area insets
+        { paddingBottom: Math.max(insets.bottom, 16) }
+      ]}>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.approveButton]}
+          onPress={() => handleAction('approve')}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Icon name="check-circle-outline" size={20} color="#FFFFFF" />
+          <Text style={styles.actionButtonText}>Approve</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionButton, styles.correctionButton]}
+          onPress={() => handleAction('correction')}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Icon name="pencil-outline" size={20} color="#FFFFFF" />
+          <Text style={styles.actionButtonText}>Correction</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionButton, styles.rejectButton]}
+          onPress={() => handleAction('reject')}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Icon name="close-circle-outline" size={20} color="#FFFFFF" />
+          <Text style={styles.actionButtonText}>Reject</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => {
-              Keyboard.dismiss();
-              navigation.goBack();
-            }}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-          >
-            <Icon name="arrow-left" size={24} color="#4B5563" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
-            Document Details
-          </Text>
-          <TouchableOpacity
-            style={styles.headerRightButton}
-            onPress={() => {
-              Alert.alert(
-                "Document Information",
-                `Name: ${document.title}\nStatus: ${document.status}\nDate: ${new Date(document.createdDate).toLocaleDateString()}\nRole: ${document.role}`,
-                [{ text: "OK" }]
-              );
-            }}
-          >
-            <Icon name="information-outline" size={24} color="#4B5563" />
-          </TouchableOpacity>
-        </View>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
-        {/* Content */}
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.select({
-            ios: 100,
-            android: 85
-          })}
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.select({
+          ios: 0,
+          android: 0
+        })}
+      >
+        {renderHeader()}
+
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            // Add padding at the bottom to ensure content is visible above the action buttons
+            {
+              paddingBottom: currentStatus === 'pending'
+                ? 100 + insets.bottom
+                : 16 + insets.bottom
+            }
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <ScrollView
-            ref={scrollViewRef}
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Document Info */}
-            <View style={styles.infoCard}>
-              <Icon name="file-document-outline" size={24} color="#4B5563" style={styles.infoIcon} />
-              <View style={styles.infoContent}>
-                <Text style={styles.documentName} numberOfLines={2} ellipsizeMode="tail">
-                  {document.title}
-                </Text>
+          {renderDocumentInfo()}
+          {renderRemarksInfo()}
+          {renderPDFPreview()}
+          {renderRemarksInput()}
+        </ScrollView>
 
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Status:</Text>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: statusStyles[currentStatus].backgroundColor }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: statusStyles[currentStatus].textColor }
-                    ]}>
-                      {document.status}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Date:</Text>
-                  <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="tail">
-                    {new Date(document.createdDate).toLocaleDateString()}
-                  </Text>
-                </View>
-
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Role:</Text>
-                  <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="tail">
-                    {document.createdBy.fullName}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            {/* PDF Preview */}
-            <Animated.View style={[styles.pdfContainer, { height: pdfHeight }]}>
-              <View style={styles.sectionTitleRow}>
-                <Text style={styles.sectionTitle}>Document Preview</Text>
-                {isKeyboardVisible && (
-                  <TouchableOpacity
-                    style={styles.expandButton}
-                    onPress={() => Keyboard.dismiss()}
-                  >
-                    <Text style={styles.expandButtonText}>Expand</Text>
-                    <Icon name="arrow-expand" size={16} color="#3B82F6" />
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={styles.pdfWrapper}>
-                {/* {pdfLoading && (
-                  <View style={styles.pdfLoading}>
-                    <ActivityIndicator size="large" color="#3B82F6" />
-                    <Text style={styles.loadingText}>Loading document...</Text>
-                  </View>
-                )} */}
-
-                <View style={styles.pdfPlaceholder}>
-                  <Icon name="file-pdf-box" size={48} color="#E5E7EB" />
-                  <Text style={styles.pdfText}>
-                    PDF preview will be displayed here
-                  </Text>
-                </View>
-                {/* <Pdf
-                  source={pdfSource}
-                  onLoadComplete={() => setPdfLoading(false)}
-                  onError={(error) => {
-                    console.log('PDF Error: ', error);
-                    setPdfLoading(false);
-                    Alert.alert("Error", "Failed to load document preview");
-                  }}
-                  style={styles.pdf}
-                /> */}
-              </View>
-            </Animated.View>
-
-            {/* Remarks Input */}
-            <View style={styles.remarksContainer}>
-              <View style={styles.sectionTitleRow}>
-                <Text style={styles.sectionTitle}>Remarks</Text>
-                <TouchableOpacity
-                  style={styles.addRemarksButton}
-                  onPress={focusRemarksInput}
-                >
-                  <Text style={styles.addRemarksText}>Add remarks</Text>
-                  <Icon name="pencil" size={16} color="#3B82F6" />
-                </TouchableOpacity>
-              </View>
-              <TextInput
-                ref={remarksInputRef}
-                style={[
-                  styles.remarksInput,
-                  isKeyboardVisible && styles.remarksInputFocused
-                ]}
-                multiline
-                placeholder="Add your remarks here..."
-                placeholderTextColor="#9CA3AF"
-                value={remarks}
-                onChangeText={setRemarks}
-                textAlignVertical="top"
-                returnKeyType="default"
-              />
-            </View>
-
-            {/* Extra padding at bottom for keyboard */}
-            {/* <View style={{ height: Platform.OS === 'ios' ? 120 : 150 }} /> */}
-          </ScrollView>
-        </KeyboardAvoidingView>
-
-        {/* Action Buttons */}
-        <View style={[
-          styles.actionContainer,
-          isKeyboardVisible && styles.actionContainerWithKeyboard
-        ]}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.approveButton]}
-            onPress={() => handleAction('approve')}
-            disabled={loading}
-            activeOpacity={0.7}
-          >
-            <Icon name="check-circle-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Approve</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.correctionButton]}
-            onPress={() => handleAction('correction')}
-            disabled={loading}
-            activeOpacity={0.7}
-          >
-            <Icon name="pencil-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Correction</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.rejectButton]}
-            onPress={() => handleAction('reject')}
-            disabled={loading}
-            activeOpacity={0.7}
-          >
-            <Icon name="close-circle-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Reject</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+        {renderActionButtons()}
+      </KeyboardAvoidingView>
 
       {loading && (
         <View style={styles.loadingOverlay}>
@@ -417,10 +457,6 @@ const DocumentDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  safeArea: {
-    flex: 1,
     backgroundColor: '#FFFFFF',
   },
   flex: {
@@ -431,16 +467,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
     backgroundColor: '#FFFFFF',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    zIndex: 10,
   },
   backButton: {
     padding: 4,
@@ -457,7 +488,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   scrollContent: {
-    paddingBottom: 16,
+    paddingTop: 8,
   },
   infoCard: {
     flexDirection: 'row',
@@ -465,7 +496,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     margin: 16,
-    // marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -561,21 +591,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingHorizontal: 16,
   },
-  pdfLoading: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#6B7280',
-  },
   remarksContainer: {
     marginHorizontal: 16,
     marginTop: 16,
+    marginBottom: 16,
   },
   addRemarksButton: {
     flexDirection: 'row',
@@ -610,7 +629,8 @@ const styles = StyleSheet.create({
   actionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingTop: 16,
+    paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
@@ -619,9 +639,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
-  },
-  actionContainerWithKeyboard: {
-    backgroundColor: 'rgba(255,255,255,0.97)',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 5,
   },
   actionButton: {
     flexDirection: 'row',
@@ -677,6 +699,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4B5563',
     fontWeight: '500',
+  },
+  remarkInfoContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  remarkActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  remarkIcon: {
+    marginRight: 8,
+  },
+  remarkActionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  remarkLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  remarkValue: {
+    fontSize: 14,
+    color: '#1F2937',
   },
 });
 

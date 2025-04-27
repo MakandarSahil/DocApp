@@ -1,5 +1,5 @@
-import React from 'react';
-import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { FlatList, Text, View, StyleSheet, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document'; // Import the shared interface
@@ -11,19 +11,16 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 interface Props {
-  // documents: Document[];
-  // status: string;
-  // onPreview: (document: Document) => void;
-  // onDownload: (document: Document) => void;
-  // isLoading?: boolean;
   query?: string;
   isAllDocsScreen?: boolean;
 }
 
 const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
 
-  const { documents, isLoading, status, } = useDocuments();
+  const { documents, isLoading, status, refreshDocuments } = useDocuments();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const handlePreview = (document: Document) => {
     navigation.navigate('DocumentDetails', { document });
@@ -45,7 +42,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
     : documents;
 
   // Loading state
-  if (isLoading) {
+  if (isLoading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3B82F6" />
@@ -56,12 +53,19 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
 
   const userRole = useAuth()?.user?.role;
 
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refreshDocuments()
+      .finally(() => setRefreshing(false)); // Stop refreshing after refetching
+  }, [refreshDocuments]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
         {isAllDocsScreen
           ? 'All Documents'
-          : `${status.charAt(0).toUpperCase() + status.slice(1)} Documents (${filterDocument.length})`}
+          : `${status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Documents'} (${filterDocument.length})`}
       </Text>
 
       <FlatList
@@ -82,7 +86,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
           <View style={styles.emptyContainer}>
             <Icon name="file-document-outline" size={48} color="#D1D5DB" />
             <Text style={styles.emptyText}>
-              No {status.toLowerCase()} documents found for {userRole}.
+              No {status?.toLowerCase() ?? 'documents'} found for {userRole}.
             </Text>
             {query ? (
               <Text style={styles.emptySubText}>
@@ -93,12 +97,18 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false }) => {
         }
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh} // Trigger onRefresh function
+            tintColor="#3B82F6" // Color of the spinner
+          />
+        }
       />
     </View>
   );
 };
 
-// Styles remain the same
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -147,7 +157,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#6B7280',
-  }
+  },
 });
 
 export default DocumentList;
