@@ -1,6 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+    package="com.docapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+     <uses-permission android:name="android.permission.VIBRATE" />
+     <uses-permission android:name="android.permission.WAKE_LOCK" />
+     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+  
 
     <application
       android:name=".MainApplication"
@@ -11,9 +18,25 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true"
       android:supportsRtl="true">
-       <meta-data
+      <meta-data
       android:name="com.google.firebase.messaging.default_notification_icon"
-      android:resource="@drawable/ic_stat_notifications_none" />
+      android:resource="@drawable/ic_stat_notifications_none"/>
+      <meta-data
+    android:name="com.google.firebase.messaging.default_notification_color"
+    android:resource="@color/notification_color"
+    tools:replace="android:resource" />
+    <meta-data
+    android:name="com.sec.android.notification.badge"
+    android:value="true" />
+<meta-data
+    android:name="com.sonyericsson.notification.badge"
+    android:value="true" />
+<meta-data
+    android:name="com.huawei.android.launcher.notification.badge"
+    android:value="true" />
+<meta-data
+    android:name="com.vivo.notification.badge"
+    android:value="true" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

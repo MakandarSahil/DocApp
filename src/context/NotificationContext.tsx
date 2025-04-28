@@ -1,7 +1,6 @@
-// NotificationContext.tsx
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Alert, PermissionsAndroid, Platform } from 'react-native';
-import { getFCMToken, requestPermission, setupListeners } from "../utils/firebaseUtils";
+import { AppState } from 'react-native';
+import { getFCMToken, requestPermission, setupListeners, createNotificationChannel } from "../utils/firebaseUtils";
 import notifee from '@notifee/react-native';
 
 type NotificationContextType = {
@@ -20,18 +19,39 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initNotifications = async () => {
       try {
-        await requestPermission();
-        const token = await getFCMToken();
-        setFcmToken(token);
-        setupListeners();
+        console.log('🔔 Initializing Notifications...');
+        const permissionGranted = await requestPermission();
+        console.log('🔔 Permission Granted:', permissionGranted);
 
-        await notifee.setBadgeCount(0);
+        if (permissionGranted) {
+          await createNotificationChannel();
+          const token = await getFCMToken();
+          console.log('🔔 Received FCM Token:', token);
+
+          if (token) {
+            setFcmToken(token);
+            setupListeners();
+          }
+
+          await notifee.setBadgeCount(0);
+          console.log('🔔 Badge count reset to 0.');
+        }
       } catch (error) {
-        console.error("Notification setup failed:", error);
+        console.error("❌ Notification setup failed:", error);
       }
     };
 
     initNotifications();
+
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      console.log('🔁 AppState changed to:', nextAppState);
+      if (nextAppState === 'active') {
+        await notifee.setBadgeCount(0);
+        console.log('🔔 Badge count reset to 0 on App Resume.');
+      }
+    });
+
+    return () => subscription.remove();
   }, []);
 
   return (

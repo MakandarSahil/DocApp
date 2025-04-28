@@ -1,5 +1,6 @@
 const config = {
-  API_URL: 'http://15.207.14.192:4000',
+  // API_URL: 'http://15.207.14.192:4000',
+  API_URL: "https://doc.nullpointers.me",
   FIREBASE_API_KEY: 'AIzaSyCPb2Z24Ef2gg5f0lMPAXyZoFpe_lruo6A',
   FIREBASE_AUTH_DOMAIN: 'document-approval-system.firebaseapp.com',
   FIREBASE_PROJECT_ID: 'document-approval-system',
