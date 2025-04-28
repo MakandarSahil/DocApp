@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import { getFCMToken, requestPermission, setupListeners } from "../utils/firebaseUtils";
+import notifee from '@notifee/react-native';
 
 type NotificationContextType = {
   fcmToken: string;
@@ -23,6 +24,8 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
         const token = await getFCMToken();
         setFcmToken(token);
         setupListeners();
+
+        await notifee.setBadgeCount(0);
       } catch (error) {
         console.error("Notification setup failed:", error);
       }
