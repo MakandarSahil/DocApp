@@ -2,14 +2,7 @@ import axios from "axios";
 import config from "../utils/config";
 import { useContext, createContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { Document } from "../types/document";
-
-export type User = {
-  _id: string;
-  email: string;
-  fullName: string;
-  role: string;
-  username: string;
-};
+import { User } from "../types/user";
 
 type DocumentsContextType = {
   documents: Document[];
@@ -21,8 +14,8 @@ type DocumentsContextType = {
   setEndDate: (date: string) => void;
   status: string;
   setStatus: (status: string) => void;
-  createdBy: User | null;
-  setCreatedBy: (creator: User | null) => void;
+  createdBy: String | null;
+  setCreatedBy: (creator: string) => void
   refreshDocuments: () => Promise<void>;
 };
 
@@ -38,7 +31,7 @@ const DocumentsProvider = ({ children }: { children: ReactNode }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("pending");
-  const [createdBy, setCreatedBy] = useState<User | null>(null);
+  const [createdBy, setCreatedBy] = useState<string | null>("");
 
   const fetchDocuments = useCallback(async () => {
     const queryParams = new URLSearchParams();
@@ -48,7 +41,7 @@ const DocumentsProvider = ({ children }: { children: ReactNode }) => {
     if (startDate) queryParams.append("startDate", startDate);
     if (endDate) queryParams.append("endDate", endDate);
     if (status) queryParams.append("status", status);
-    if (createdBy?._id) queryParams.append("createdBy", createdBy._id); // Filter by user ID
+    if (createdBy) queryParams.append("createdBy", createdBy); // Filter by user ID
 
     try {
       setIsLoading(true);

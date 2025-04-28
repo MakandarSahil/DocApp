@@ -1,43 +1,30 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes';
-import { User } from '../context/DocumentsContext'; // Make sure to import your User type
+import { User } from '../types/user'; // Make sure to import your User type
 
 interface UserItemProps {
-  user: User & { // Extend with any additional user properties you need
-    id: string;
-    name: string;
-    email: string;
-    role?: string;
-  };
+  user: User;
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleProfilePress = () => {
-    navigation.navigate('Profile', { userId: user.id });
+    // navigation.navigate('AllDocuments', { createdBy: user._id });
   };
 
-  const handleCallPress = () => {
-    console.log("send mobile no from backend");
-  };
+  const handleCallPress = () => Linking.openURL(`tel:+91 ${user.phone}`);
 
   const handleDocumentPress = () => {
     // Navigate to AllDocuments screen with the user as createdBy filter
-    // navigation.navigate('AllDocuments', {
-    //   createdBy: {
-    //     _id: user.id,
-    //     fullName: user.name,
-    //     email: user.email,
-    //     role: user.role || '',
-    //     username: user.email.split('@')[0] // Or get username from your user object
-    //   }
-    // });
-    console.log(`Viewing documents for ${user.fullName}`);
+    navigation.navigate('AllDocuments', {
+      
+    });
+    console.log(`Viewing documents for ${user.name || 'Unknown User'}`);
   };
 
   return (
@@ -57,7 +44,7 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
           <View style={styles.userInfo}>
             <View style={styles.nameRow}>
               <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-                {user.name}
+                {user.name || user.email.split('@')[0]}  {/* Fallback to email prefix */}
               </Text>
               {user.role && (
                 <View style={styles.roleBadge}>

@@ -7,15 +7,9 @@ import { useAuth } from '../context/AuthContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes';
 import { useNavigation } from '@react-navigation/native';
-import UserItem from './UserItem'; // Import UserItem component
+import UserItem from './UserItem';
 import config from '../utils/config';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role?: string;
-}
+import { User } from '../types/user';
 
 interface Props {
   query?: string;
@@ -45,6 +39,8 @@ const UsersList: React.FC<Props> = ({ query }) => {
           name: user.fullName,
           email: user.email,
           role: user.role,
+          phone: user.mobileNo,
+          isActive: user.isActive,
         }));
 
         setUsers(mappedUsers);

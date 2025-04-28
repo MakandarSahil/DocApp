@@ -1,5 +1,5 @@
 // navigationTypes.ts
-import { User } from "../context/DocumentsContext";
+import { User } from "../types/user";
 
 export type RootStackParamList = {
   Login: undefined;

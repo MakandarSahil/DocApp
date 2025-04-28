@@ -5,19 +5,19 @@ import DashboardNavbar from '../../components/DashboardNavbar';
 import { useAuth } from '../../context/AuthContext';
 import DocumentList from '../../components/DocumenList';
 import { useDocuments } from '../../context/DocumentsContext';
-import { User } from '../../context/DocumentsContext';
+import { User } from '../../types/user';
 
 interface AllDocumentsProps {
   route?: {
     params?: {
-      createdBy?: User;
+      createdBy?: string;
     };
   };
 }
 
 
 const AllDocuments: React.FC<AllDocumentsProps> = ({ route }) => {
-  const createdBy = route?.params?.createdBy;
+  const { createdBy } = route?.params || {};
   const navigation = useNavigation();
   const { user } = useAuth();
   const [searchActive, setSearchActive] = useState(false);
@@ -60,7 +60,7 @@ const AllDocuments: React.FC<AllDocumentsProps> = ({ route }) => {
       />
 
       <View style={{ paddingHorizontal: 16, flex: 1, paddingTop: 14, backgroundColor: '#FFFFFF', paddingBottom: 16 }}>
-        <DocumentList query={query} isAllDocsScreen={true} createdBy={createdBy} />
+        <DocumentList query={query} isAllDocsScreen={true} />
       </View>
     </SafeAreaView>
   );

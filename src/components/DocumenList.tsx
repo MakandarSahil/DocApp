@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   FlatList,
   Text,
@@ -15,7 +15,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentItem from './DocumentItem';
 import { Document } from '../types/document';
 import { useAuth } from '../context/AuthContext';
-import { useDocuments, User } from '../context/DocumentsContext';
+import { useDocuments } from '../context/DocumentsContext';
+import { User } from '../types/user'
 import { useNavigation } from '@react-navigation/native';
 import { downloadDocument } from '../utils/documentHandlers';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,7 +25,7 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 interface Props {
   query?: string;
   isAllDocsScreen?: boolean;
-  createdBy?: User | null;
+  createdBy?: string;
 }
 
 // Define filter types
@@ -154,7 +155,8 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
     return filteredDocs;
   }, [documents, query, filters]);
 
-  const filteredDocuments = filterDocuments();
+  const filteredDocuments = useMemo(() => filterDocuments(), [documents, query, filters]);
+
 
   if (isLoading && !refreshing) {
     return (
@@ -202,7 +204,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
             <Icon name="file-document-outline" size={48} color="#D1D5DB" />
             <Text style={styles.emptyText}>
               {createdBy
-                ? `No documents found created by ${createdBy.fullName}`
+                ? `No documents found created by ${createdBy}`
                 : `No ${status?.toLowerCase() ?? 'documents'} found for ${userRole}.`}
             </Text>
             {query && (
