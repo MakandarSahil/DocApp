@@ -21,6 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import { downloadDocument } from '../utils/documentHandlers';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { downloadAndOpenPdf } from '../hooks/useFileHandlers';
 
 interface Props {
   query?: string;
@@ -79,7 +80,8 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
 
   const handleDownload = (document: Document) => {
     try {
-      downloadDocument(document);
+      // downloadDocument(document);
+      downloadAndOpenPdf(document.fileUniqueName);
       Alert.alert("Download Started", `${document.title} is being downloaded.`);
     } catch (error) {
       Alert.alert("Download Error", "Unable to download this document. Please try again later.");
