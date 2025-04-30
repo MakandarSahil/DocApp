@@ -4,6 +4,7 @@ import axios from 'axios';
 import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import config from '../utils/config';
 
+//withotut enc
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   const binary = String.fromCharCode(...new Uint8Array(buffer));
   if (typeof global.btoa === 'function') {
