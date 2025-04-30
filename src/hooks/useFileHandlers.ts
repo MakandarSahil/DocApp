@@ -4,45 +4,65 @@ import axios from 'axios';
 import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import config from '../utils/config';
 
-const requestStoragePermission = async () => {
-  if (Platform.OS === 'android') {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Storage Permission',
-        message: 'App needs access to your storage to download files.',
-        buttonPositive: 'OK',
-      }
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  if (typeof global.btoa === 'function') {
+    return global.btoa(binary);
   }
-  return true;
+  // Polyfill for btoa
+  return Buffer.from(binary, 'binary').toString('base64');
 };
 
+const requestStoragePermission = async () => {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    let permissionsToRequest = [];
+    
+    if (Platform.Version >= 33) {
+      permissionsToRequest = [
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+      ];
+    } else {
+      permissionsToRequest = [
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ];
+    }
+
+    const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+    
+    return Object.values(granted).every(
+      status => status === PermissionsAndroid.RESULTS.GRANTED
+    );
+  } catch (err) {
+    console.warn('Permission error:', err);
+    return false;
+  }
+};
 
 export const downloadAndOpenPdf = async (filename: string) => {
   try {
     const hasPermission = await requestStoragePermission();
     if (!hasPermission) {
-      Alert.alert("Permission denied", "Cannot access storage");
+      Alert.alert('Permission denied', 'Cannot download the file.');
       return;
     }
 
-    const fileUrl = `${config.API_URL}/file/download-pdf/${filename}`; // Replace with your server IP 
+    const fileUrl = `${config.API_URL}/file/download-pdf/${filename}`; // Replace with your local IP
     const localFilePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-
+    console.log("localFilePath", localFilePath);
     const response = await axios.get(fileUrl, {
-      responseType: 'blob', // or 'arraybuffer' for binary
+      responseType: 'arraybuffer',
     });
 
-    const base64Content = await response.data.text(); // since you send it as utf8
-    const pdfBuffer = Buffer.from(base64Content, 'base64'); // convert to buffer
-    await RNFS.writeFile(localFilePath, pdfBuffer.toString('base64'), 'base64');
+    const base64Data = arrayBufferToBase64(response.data);
+    await RNFS.writeFile(localFilePath, base64Data, 'base64');
 
     await FileViewer.open(localFilePath, { showOpenWithDialog: true });
-  } catch (error) {
-    console.error("Download error:", error);
-    Alert.alert("Error", "Failed to download or open PDF");
+  } catch (err) {
+    console.error('Download error:', err);
+    Alert.alert('Download failed', 'Could not download or open the PDF');
   }
 };
 
