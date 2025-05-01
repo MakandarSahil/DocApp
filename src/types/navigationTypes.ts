@@ -1,12 +1,13 @@
 // navigationTypes.ts
-import { User } from "../types/user";
+import {User} from '../types/user';
 
 export type RootStackParamList = {
   Login: undefined;
-  Profile: { userId: string };
-  DocumentDetails: { document: Document };
-  AllDocuments: { createdBy?: User };
+  Profile: {userId: string};
+  DocumentDetails: {document: Document};
+  AllDocuments: {createdBy?: User};
   AllUsers: undefined;
+  DocumentPreview: {url: string};
   // Add all your other screens here
 };
 

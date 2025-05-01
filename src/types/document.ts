@@ -30,4 +30,5 @@ export interface Document {
     departmentName: string;
   };
   fileUrl?: string; // Optional file preview/download link
+  documentUrl?: string; // Optional document preview/download link
 }

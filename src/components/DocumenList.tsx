@@ -75,7 +75,9 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
   }, [refreshDocuments]);
 
   const handlePreview = (document: Document) => {
-    navigation.navigate('DocumentDetails', { document });
+    navigation.navigate('DocumentPreview', {
+      name: document.fileUniqueName
+    });
   };
 
   const handleDownload = (document: Document) => {
@@ -87,6 +89,11 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
       Alert.alert("Download Error", "Unable to download this document. Please try again later.");
     }
   };
+
+  const handleOpen = (document: Document) => {
+    navigation.navigate('DocumentDetails', { document });
+  };
+
 
   const applyFilters = () => {
     // Close the filter modal
@@ -195,6 +202,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
             document={item}
             onPreview={handlePreview}
             onDownload={handleDownload}
+            onOpen={handleOpen}
           />
         )}
         contentContainerStyle={[
@@ -231,6 +239,7 @@ const DocumentList: React.FC<Props> = ({ query, isAllDocsScreen = false, created
           />
         }
       />
+
 
       {/* Filter Modal */}
       <Modal

@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 import axios from 'axios';
-import { PermissionsAndroid, Platform, Alert } from 'react-native';
+import {PermissionsAndroid, Platform, Alert} from 'react-native';
 import config from '../utils/config';
 
 // ✅ Safe Base64 converter to avoid stack overflow
@@ -9,7 +9,7 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   const bytes = new Uint8Array(buffer);
   const chunkSize = 0x8000; // 32KB
   let binary = '';
-  
+
   // Convert each chunk to a number[] and pass to String.fromCharCode
   for (let i = 0; i < bytes.length; i += chunkSize) {
     const chunk = Array.from(bytes.subarray(i, i + chunkSize)); // Convert Uint8Array to number[]
@@ -39,10 +39,12 @@ const requestStoragePermission = async () => {
       ];
     }
 
-    const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+    const granted = await PermissionsAndroid.requestMultiple(
+      permissionsToRequest,
+    );
 
     return Object.values(granted).every(
-      status => status === PermissionsAndroid.RESULTS.GRANTED
+      status => status === PermissionsAndroid.RESULTS.GRANTED,
     );
   } catch (err) {
     console.warn('Permission error:', err);
@@ -59,8 +61,12 @@ export const downloadAndOpenPdf = async (filename: string) => {
     }
 
     const fileUrl = `${config.API_URL}/file/download-pdf/${filename}`;
-    const localFilePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-    console.log("localFilePath", localFilePath);
+    // const localFilePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+    const localFilePath =
+      Platform.OS === 'android'
+        ? `${RNFS.DownloadDirectoryPath}/${filename}`
+        : `${RNFS.DocumentDirectoryPath}/${filename}`;
+    console.log('localFilePath', localFilePath);
 
     const response = await axios.get(fileUrl, {
       responseType: 'arraybuffer',
@@ -69,7 +75,13 @@ export const downloadAndOpenPdf = async (filename: string) => {
     const base64Data = arrayBufferToBase64(response.data);
     await RNFS.writeFile(localFilePath, base64Data, 'base64');
 
-    await FileViewer.open(localFilePath, { showOpenWithDialog: true });
+    await FileViewer.open(localFilePath, {showOpenWithDialog: true});
+
+    // await FileViewer.open(localFilePath, {
+    //   showOpenWithDialog: true,
+    //   displayName: filename,
+    //   type: 'application/pdf',
+    // });
   } catch (err) {
     console.error('Download error:', err);
     Alert.alert('Download failed', 'Could not download or open the PDF');
