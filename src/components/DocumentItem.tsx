@@ -7,50 +7,57 @@ interface DocumentItemProps {
   document: Document;
   onPreview: (document: Document) => void;
   onDownload: (document: Document) => void;
+  onOpen: (document: Document) => void;
 }
 
-const DocumentItem: React.FC<DocumentItemProps> = ({ document, onPreview, onDownload }) => {
+const DocumentItem: React.FC<DocumentItemProps> = ({ document, onPreview, onDownload, onOpen }) => {
   return (
-    <View style={styles.documentCard}>
-      <View style={styles.documentInfo}>
-        <Icon name="file-document-outline" size={28} color="#4B5563" style={styles.fileIcon} />
-        <View style={styles.textContainer}>
-          <Text style={styles.documentName}>{document.title}</Text>
-          <Text style={styles.statusText}>Department : {document.department.departmentName}</Text>
-          <View style={styles.metaInfo}>
-            <Text style={styles.metaText}>From: {document.createdBy.fullName}</Text>
-            <Text style={styles.metaText}>{new Date(document.createdDate).toLocaleDateString()}</Text>
-            <View style={[styles.statusBadge,
-            document.status === 'approved' ? styles.statusApproved :
-              document.status === 'pending' ? styles.statusPending :
-                styles.statusRejected
-            ]}>
-              <Text style={styles.statusText}>{document.status}</Text>
+    <TouchableOpacity
+      onPress={() => onOpen(document)}
+      activeOpacity={1}
+    >
+
+      <View style={styles.documentCard}>
+        <View style={styles.documentInfo}>
+          <Icon name="file-document-outline" size={28} color="#4B5563" style={styles.fileIcon} />
+          <View style={styles.textContainer}>
+            <Text style={styles.documentName}>{document.title}</Text>
+            <Text style={styles.statusText}>Department : {document.department.departmentName}</Text>
+            <View style={styles.metaInfo}>
+              <Text style={styles.metaText}>From: {document.createdBy.fullName}</Text>
+              <Text style={styles.metaText}>{new Date(document.createdDate).toLocaleDateString()}</Text>
+              <View style={[styles.statusBadge,
+              document.status === 'approved' ? styles.statusApproved :
+                document.status === 'pending' ? styles.statusPending :
+                  styles.statusRejected
+              ]}>
+                <Text style={styles.statusText}>{document.status}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.actionButton && styles.actionButton1}
-          onPress={() => onPreview(document)}
-          activeOpacity={0.7}
-        >
-          <Icon name="eye-outline" size={18} color="#3B82F6" />
-          <Text style={styles.actionText1}>Preview</Text>
-        </TouchableOpacity>
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.actionButton && styles.actionButton1}
+            onPress={() => onPreview(document)}
+            activeOpacity={0.7}
+          >
+            <Icon name="eye-outline" size={18} color="#3B82F6" />
+            <Text style={styles.actionText1}>Preview</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.actionButton && styles.actionButton2}
-          onPress={() => onDownload(document)}
-          activeOpacity={0.7}
-        >
-          <Icon name="download-outline" size={18} color="#10B981" />
-          <Text style={styles.actionText2}>Download</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton && styles.actionButton2}
+            onPress={() => onDownload(document)}
+            activeOpacity={0.7}
+          >
+            <Icon name="download-outline" size={18} color="#10B981" />
+            <Text style={styles.actionText2}>Download</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
