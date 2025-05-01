@@ -4,13 +4,21 @@ import axios from 'axios';
 import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import config from '../utils/config';
 
-//withotut enc
+// ✅ Safe Base64 converter to avoid stack overflow
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
-  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000; // 32KB
+  let binary = '';
+  
+  // Convert each chunk to a number[] and pass to String.fromCharCode
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = Array.from(bytes.subarray(i, i + chunkSize)); // Convert Uint8Array to number[]
+    binary += String.fromCharCode.apply(null, chunk); // Now it's a valid number[] array
+  }
+
   if (typeof global.btoa === 'function') {
     return global.btoa(binary);
   }
-  // Polyfill for btoa
   return Buffer.from(binary, 'binary').toString('base64');
 };
 
@@ -19,7 +27,7 @@ const requestStoragePermission = async () => {
 
   try {
     let permissionsToRequest = [];
-    
+
     if (Platform.Version >= 33) {
       permissionsToRequest = [
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
@@ -32,7 +40,7 @@ const requestStoragePermission = async () => {
     }
 
     const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
-    
+
     return Object.values(granted).every(
       status => status === PermissionsAndroid.RESULTS.GRANTED
     );
@@ -50,9 +58,10 @@ export const downloadAndOpenPdf = async (filename: string) => {
       return;
     }
 
-    const fileUrl = `${config.API_URL}/file/download-pdf/${filename}`; // Replace with your local IP
+    const fileUrl = `${config.API_URL}/file/download-pdf/${filename}`;
     const localFilePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
     console.log("localFilePath", localFilePath);
+
     const response = await axios.get(fileUrl, {
       responseType: 'arraybuffer',
     });
@@ -66,4 +75,3 @@ export const downloadAndOpenPdf = async (filename: string) => {
     Alert.alert('Download failed', 'Could not download or open the PDF');
   }
 };
-
