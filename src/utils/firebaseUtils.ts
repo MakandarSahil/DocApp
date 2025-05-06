@@ -1,18 +1,77 @@
 
-import { PermissionsAndroid, Platform } from 'react-native';
-import { getApp } from '@react-native-firebase/app';
-import {
-  getMessaging,
-  requestPermission as requestMessagingPermission,
-  getToken,
-  onMessage,
-  setBackgroundMessageHandler,
-} from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance, AndroidVisibility, EventType } from '@notifee/react-native';
+//import { PermissionsAndroid, Platform } from 'react-native';
+//import { getApp } from '@react-native-firebase/app';
+ //import {
+ //  getMessaging,
+//   requestPermission as requestMessagingPermission,
+//   getToken,
+//   onMessage,
+//   setBackgroundMessageHandler,
+//   messaging
+ //} from '@react-native-firebase/messaging';
+//import notifee, { AndroidImportance, AndroidVisibility, EventType } from '@notifee/react-native';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 
-const messaging = getMessaging(getApp());
+//Tej: getApp() is used for WED SDK and not for react native SDK. Commented for now. Please confirm before removing.
+//const messaging = getMessaging(getApp());
+
+
+// Request Notification Permission
+//Tej: Created new function below. This function is android specific.
+/*
+export const requestPermission = async (): Promise<boolean> => {
+  try {
+    if (Platform.OS === 'android' && Platform.Version >= 33) {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      );
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('❌ Android POST_NOTIFICATIONS permission denied');
+        return false;
+      }
+    }
+
+    console.log('getting permission for notification');
+    const authStatus = await messaging().requestPermission();
+    console.log('authstatus is:',authStatus);
+   // const authStatus = await requestMessagingPermission(messaging);
+    
+    const enabled = authStatus === 1 || authStatus === 2;
+
+    if (enabled) {
+      console.log('✅ Notification permission granted');
+    } else {
+      console.log('❌ Notification permission not granted');
+    }
+
+    return enabled;
+  } catch (error) {
+    console.error('❌ Failed to request notification permission:', error);
+    return false;
+  }
+};*/
+
+export const requestUserPermission = async (): Promise<boolean> => {
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+  if (enabled) {
+    console.log('✅ Notification permission granted');
+    console.log('Authorization status:', authStatus);
+    //await getFCMToken();
+    return true;
+  } else {
+    console.log('❌ Notification permission not granted');
+  }
+  
+  return false;
+};
 
 // Create Notification Channel
+//Tej: Not sure why we need to create a channel. Will update after confirmation.
+/*
 export const createNotificationChannel = async () => {
   try {
     await notifee.createChannel({
@@ -33,40 +92,13 @@ export const createNotificationChannel = async () => {
     console.error('❌ Failed to create notification channel:', error);
   }
 };
+*/
 
-// Request Notification Permission
-export const requestPermission = async (): Promise<boolean> => {
-  try {
-    if (Platform.OS === 'android' && Platform.Version >= 33) {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      );
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('❌ Android POST_NOTIFICATIONS permission denied');
-        return false;
-      }
-    }
-
-    const authStatus = await requestMessagingPermission(messaging);
-    const enabled = authStatus === 1 || authStatus === 2;
-
-    if (enabled) {
-      console.log('✅ Notification permission granted');
-    } else {
-      console.log('❌ Notification permission not granted');
-    }
-
-    return enabled;
-  } catch (error) {
-    console.error('❌ Failed to request notification permission:', error);
-    return false;
-  }
-};
 
 // Get FCM Token
 export const getFCMToken = async (): Promise<string> => {
   try {
-    const token = await getToken(messaging);
+    const token = await messaging().getToken();
     console.log('✅ FCM Token:', token);
     return token;
   } catch (error) {
@@ -76,6 +108,7 @@ export const getFCMToken = async (): Promise<string> => {
 };
 
 // Setup Listeners
+/*
 export const setupListeners = () => {
   console.log('🔔 Setting up Notification Listeners...');
 
@@ -153,4 +186,4 @@ export const setupListeners = () => {
       console.log('📲 Notification was pressed (Background)');
     }
   });
-};
+};*/
